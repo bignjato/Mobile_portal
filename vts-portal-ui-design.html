@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VTS Portal – UI Dizajn</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red: #EF0C0C;
+    --dark: #242930;
+    --grey: #7B8287;
+    --bg: #F1F5F9;
+    --white: #ffffff;
+    --border: #E2E8F0;
+    --text: #0F172A;
+    --text2: #64748B;
+    --green: #10B981;
+    --amber: #F59E0B;
+    --blue: #3B82F6;
+    --purple: #8B5CF6;
+    --radius: 14px;
+    --shadow: 0 2px 16px rgba(0,0,0,0.10);
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #E8ECF0;
+    color: var(--text);
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+
+  /* ── LAYOUT ───────────────────────────────── */
+  .page-title {
+    text-align: center;
+    margin-bottom: 12px;
+  }
+  .page-title h1 { font-size: 28px; font-weight: 800; color: var(--dark); }
+  .page-title p  { font-size: 14px; color: var(--grey); margin-top: 4px; }
+
+  .legend {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 16px;
+    margin-bottom: 40px;
+  }
+  .legend-item {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 600; color: var(--text2);
+  }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  .screens-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 36px;
+    align-items: flex-start;
+  }
+
+  /* ── PHONE FRAME ─────────────────────────── */
+  .phone-wrap {
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+  }
+  .phone-label {
+    font-size: 13px; font-weight: 700; color: var(--grey);
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .phone-frame {
+    width: 375px;
+    background: #1a1a2e;
+    border-radius: 44px;
+    padding: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.08);
+    position: relative;
+  }
+  .phone-notch {
+    width: 120px; height: 30px;
+    background: #1a1a2e;
+    border-radius: 0 0 18px 18px;
+    margin: 0 auto 8px;
+    display: flex; align-items: center; justify-content: center;
+    gap: 6px;
+    position: relative; z-index: 2;
+  }
+  .notch-cam { width: 10px; height: 10px; background: #2a2a3e; border-radius: 50%; }
+  .notch-speaker { width: 50px; height: 5px; background: #2a2a3e; border-radius: 4px; }
+  .phone-screen {
+    background: var(--bg);
+    border-radius: 34px;
+    overflow: hidden;
+    height: 740px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+  .phone-home-bar {
+    position: absolute; bottom: 8px; left: 50%;
+    transform: translateX(-50%);
+    width: 120px; height: 4px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 4px;
+    z-index: 10;
+  }
+
+  /* ── STATUS BAR ──────────────────────────── */
+  .status-bar {
+    background: var(--dark);
+    padding: 10px 20px 6px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .status-time { color: white; font-size: 13px; font-weight: 700; }
+  .status-icons { display: flex; gap: 6px; align-items: center; }
+  .status-icons span { font-size: 12px; color: rgba(255,255,255,0.8); }
+
+  /* ── HEADER ──────────────────────────────── */
+  .app-header {
+    background: var(--dark);
+    padding: 12px 18px 14px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .app-header-left {}
+  .app-header-title { color: white; font-size: 18px; font-weight: 800; line-height: 1.2; }
+  .app-header-sub { color: #9CA3AF; font-size: 11px; margin-top: 2px; }
+  .app-header-actions { display: flex; gap: 8px; }
+  .icon-btn {
+    background: rgba(255,255,255,0.12);
+    border: none; border-radius: 8px; padding: 8px;
+    color: white; font-size: 16px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px;
+  }
+
+  /* ── SCROLL AREA ─────────────────────────── */
+  .scroll-area {
+    flex: 1; overflow-y: auto; overflow-x: hidden;
+    padding: 14px 14px 36px;
+    display: flex; flex-direction: column; gap: 10px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .scroll-area::-webkit-scrollbar { display: none; }
+
+  /* ── BOTTOM NAV ──────────────────────────── */
+  .bottom-nav {
+    background: white;
+    border-top: 1px solid var(--border);
+    display: flex;
+    padding: 6px 0 20px;
+    flex-shrink: 0;
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; gap: 3px;
+    padding: 6px 4px;
+    font-size: 10px; font-weight: 600;
+    color: var(--grey); cursor: pointer;
+    position: relative;
+  }
+  .nav-item.active { color: var(--red); }
+  .nav-item .nav-icon { font-size: 22px; line-height: 1; }
+  .nav-badge {
+    position: absolute; top: 4px; right: calc(50% - 18px);
+    background: var(--red); color: white;
+    font-size: 9px; font-weight: 800;
+    min-width: 16px; height: 16px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 4px;
+  }
+
+  /* ══════════════════════════════════════════
+     EKRAN 1 – LOGIN
+  ══════════════════════════════════════════ */
+  .login-bg {
+    flex: 1;
+    background: linear-gradient(160deg, #242930 0%, #1a1e24 60%, #0f1215 100%);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 28px 22px;
+    gap: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .login-bg::before {
+    content: '';
+    position: absolute; top: -80px; right: -80px;
+    width: 240px; height: 240px;
+    background: radial-gradient(circle, rgba(239,12,12,0.18) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .login-bg::after {
+    content: '';
+    position: absolute; bottom: -60px; left: -60px;
+    width: 180px; height: 180px;
+    background: radial-gradient(circle, rgba(239,12,12,0.10) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .login-logo-area {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    position: relative; z-index: 1;
+  }
+  .login-logo-box {
+    background: white; border-radius: 16px;
+    padding: 14px 22px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+  .login-app-name {
+    color: white; font-size: 24px; font-weight: 900; letter-spacing: 1px;
+    text-align: center;
+  }
+  .login-app-sub {
+    color: #9CA3AF; font-size: 12px; text-align: center;
+  }
+  .login-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 22px 18px;
+    width: 100%;
+    backdrop-filter: blur(10px);
+    position: relative; z-index: 1;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .login-field-label { color: #9CA3AF; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
+  .login-field-input {
+    background: rgba(255,255,255,0.08);
+    border: 1.5px solid rgba(255,255,255,0.15);
+    border-radius: 12px;
+    padding: 14px;
+    color: white;
+    font-size: 24px; font-weight: 800;
+    text-align: center;
+    letter-spacing: 4px;
+    width: 100%;
+    margin-top: 6px;
+  }
+  .login-hint { color: #64748B; font-size: 11px; text-align: center; }
+  .btn-login {
+    background: var(--red);
+    color: white; border: none; border-radius: 14px;
+    padding: 16px; font-size: 16px; font-weight: 800;
+    width: 100%; cursor: pointer;
+    box-shadow: 0 4px 16px rgba(239,12,12,0.4);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .login-footer { color: #4B5563; font-size: 11px; text-align: center; }
+
+  /* ══════════════════════════════════════════
+     EKRAN 2 – DASHBOARD
+  ══════════════════════════════════════════ */
+  .dash-hero {
+    background: linear-gradient(135deg, var(--dark) 0%, #2d3540 100%);
+    padding: 16px 16px 20px;
+    flex-shrink: 0;
+  }
+  .dash-greeting { color: #9CA3AF; font-size: 12px; }
+  .dash-name { color: white; font-size: 20px; font-weight: 800; margin-top: 2px; }
+  .dash-meta { display: flex; gap: 8px; margin-top: 10px; }
+  .dash-chip {
+    background: rgba(255,255,255,0.1);
+    border-radius: 20px; padding: 4px 10px;
+    color: rgba(255,255,255,0.8); font-size: 11px; font-weight: 600;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .dash-chip.red { background: rgba(239,12,12,0.25); color: #FCA5A5; }
+
+  .kpi-row {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px; padding: 0;
+  }
+  .kpi-card {
+    background: white; border-radius: 12px;
+    padding: 12px 10px; text-align: center;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  }
+  .kpi-value { font-size: 26px; font-weight: 900; line-height: 1; }
+  .kpi-label { font-size: 10px; font-weight: 600; color: var(--text2); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .kpi-card.kpi-red .kpi-value { color: var(--red); }
+  .kpi-card.kpi-green .kpi-value { color: var(--green); }
+  .kpi-card.kpi-amber .kpi-value { color: var(--amber); }
+
+  .section-title {
+    font-size: 12px; font-weight: 700; color: var(--text2);
+    text-transform: uppercase; letter-spacing: 0.6px;
+    padding: 4px 0 2px;
+  }
+
+  .progress-card {
+    background: white; border-radius: 14px;
+    padding: 14px 14px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  }
+  .progress-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .progress-label { font-size: 13px; font-weight: 700; }
+  .progress-pct { font-size: 13px; font-weight: 800; color: var(--green); }
+  .progress-bar-bg { background: #F1F5F9; border-radius: 99px; height: 8px; overflow: hidden; }
+  .progress-bar-fill { background: linear-gradient(90deg, var(--green), #34D399); height: 100%; border-radius: 99px; }
+
+  .nalog-mini {
+    background: white; border-radius: 14px;
+    padding: 12px 14px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .nalog-mini-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .nalog-mini-body { flex: 1; min-width: 0; }
+  .nalog-mini-title { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .nalog-mini-sub { font-size: 11px; color: var(--text2); margin-top: 2px; }
+  .nalog-mini-badge {
+    font-size: 10px; font-weight: 700; border-radius: 20px;
+    padding: 3px 8px; flex-shrink: 0; white-space: nowrap;
+  }
+
+  /* ══════════════════════════════════════════
+     EKRAN 3 – RASPORED
+  ══════════════════════════════════════════ */
+  .cal-strip {
+    background: var(--dark);
+    padding: 10px 14px 14px;
+    flex-shrink: 0;
+  }
+  .cal-month { color: #9CA3AF; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 8px; }
+  .cal-days { display: flex; gap: 4px; }
+  .cal-day {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    padding: 6px 4px; border-radius: 10px; cursor: pointer;
+  }
+  .cal-day.today { background: var(--red); }
+  .cal-day.has-event { position: relative; }
+  .cal-day-name { font-size: 9px; font-weight: 600; color: #6B7280; text-transform: uppercase; }
+  .cal-day.today .cal-day-name { color: rgba(255,255,255,0.8); }
+  .cal-day-num { font-size: 16px; font-weight: 800; color: #D1D5DB; margin-top: 2px; }
+  .cal-day.today .cal-day-num { color: white; }
+  .cal-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--red); margin-top: 3px; }
+  .cal-day.today .cal-dot { background: rgba(255,255,255,0.6); }
+
+  .timeline-item {
+    background: white; border-radius: 14px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    overflow: hidden; display: flex;
+  }
+  .timeline-accent { width: 5px; flex-shrink: 0; }
+  .timeline-body { padding: 12px 12px; flex: 1; }
+  .timeline-time { font-size: 11px; font-weight: 700; color: var(--text2); }
+  .timeline-title { font-size: 14px; font-weight: 800; margin-top: 2px; }
+  .timeline-partner { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .timeline-addr { font-size: 11px; color: #94A3B8; margin-top: 3px; }
+  .timeline-row { display: flex; justify-content: space-between; align-items: flex-start; }
+  .timeline-badge {
+    font-size: 10px; font-weight: 700; border-radius: 12px;
+    padding: 3px 8px; white-space: nowrap; flex-shrink: 0; margin-left: 8px;
+  }
+  .tl-done { background: #F0FDF4; color: var(--green); }
+  .tl-active { background: #FFFBEB; color: var(--amber); }
+  .tl-plan { background: #EFF6FF; color: var(--blue); }
+
+  .timeline-gap {
+    display: flex; align-items: center; gap: 8px;
+    padding: 4px 6px;
+  }
+  .tg-line { flex: 1; height: 1px; background: var(--border); }
+  .tg-text { font-size: 10px; color: #CBD5E1; font-weight: 600; white-space: nowrap; }
+
+  /* ══════════════════════════════════════════
+     EKRAN 4 – OBAVIJESTI
+  ══════════════════════════════════════════ */
+  .notif-tabs {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    display: flex; padding: 0 14px;
+    flex-shrink: 0;
+  }
+  .notif-tab {
+    flex: 1; padding: 12px 4px; text-align: center;
+    font-size: 13px; font-weight: 700;
+    color: var(--text2); border-bottom: 2px solid transparent;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .notif-tab.active { color: var(--red); border-bottom-color: var(--red); }
+  .notif-count {
+    background: var(--red); color: white;
+    font-size: 10px; font-weight: 800;
+    min-width: 18px; height: 18px; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 4px;
+  }
+  .notif-count.grey { background: #E2E8F0; color: var(--text2); }
+
+  .notif-card {
+    background: white; border-radius: 14px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+    overflow: hidden;
+  }
+  .notif-item {
+    padding: 12px 14px;
+    display: flex; gap: 12px; align-items: flex-start;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+  .notif-item:last-child { border-bottom: none; }
+  .notif-item.unread { background: #FAFBFF; }
+  .notif-unread-dot {
+    position: absolute; top: 14px; right: 14px;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--red);
+  }
+  .notif-icon-wrap {
+    width: 38px; height: 38px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .ni-red { background: #FEF2F2; }
+  .ni-blue { background: #EFF6FF; }
+  .ni-green { background: #F0FDF4; }
+  .ni-amber { background: #FFFBEB; }
+  .notif-body { flex: 1; min-width: 0; }
+  .notif-title { font-size: 13px; font-weight: 800; padding-right: 16px; }
+  .notif-msg { font-size: 12px; color: var(--text2); margin-top: 3px; line-height: 1.4; }
+  .notif-time { font-size: 10px; color: #94A3B8; margin-top: 4px; }
+
+  .empty-notif {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 40px 20px; gap: 8px;
+  }
+  .empty-icon { font-size: 44px; }
+  .empty-text { font-size: 14px; font-weight: 700; color: var(--text2); }
+  .empty-sub { font-size: 12px; color: #94A3B8; }
+
+  /* ══════════════════════════════════════════
+     BOJE SEKCIJA (DESIGN TOKENS)
+  ══════════════════════════════════════════ */
+  .tokens-section {
+    max-width: 900px; margin: 60px auto 0;
+    background: white; border-radius: 20px;
+    padding: 28px 28px;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+  }
+  .tokens-title { font-size: 18px; font-weight: 800; color: var(--dark); margin-bottom: 20px; }
+  .tokens-grid { display: flex; flex-wrap: wrap; gap: 12px; }
+  .token-chip {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--bg); border-radius: 10px; padding: 8px 12px;
+    min-width: 160px;
+  }
+  .token-swatch { width: 28px; height: 28px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.08); flex-shrink: 0; }
+  .token-name { font-size: 12px; font-weight: 700; color: var(--text); }
+  .token-hex { font-size: 11px; color: var(--text2); font-family: monospace; }
+</style>
+</head>
+<body>
+
+<div class="page-title">
+  <h1>VTS Portal – UI Dizajn</h1>
+  <p>Mobilni portal za radne naloge · OneTech · 2025</p>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#EF0C0C"></div> Primarna (crvena)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#242930"></div> Tamna / Header</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#10B981"></div> Potpisan</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#F59E0B"></div> U tijeku</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#3B82F6"></div> Planiran</div>
+</div>
+
+<div class="screens-row">
+
+  <!-- ══════════ EKRAN 1: LOGIN ══════════ -->
+  <div class="phone-wrap">
+    <div class="phone-label">① Login</div>
+    <div class="phone-frame">
+      <div class="phone-notch">
+        <div class="notch-cam"></div>
+        <div class="notch-speaker"></div>
+        <div class="notch-cam"></div>
+      </div>
+      <div class="phone-screen">
+        <div class="login-bg">
+
+          <div class="login-logo-area">
+            <div class="login-logo-box">
+              <!-- OneTech Logo SVG inline -->
+              <svg width="140" height="22" viewBox="0 0 480 76" xmlns="http://www.w3.org/2000/svg">
+                <path fill="#242930" d="M0,10.86V65.14A10.86,10.86,0,0,0,10.86,76H54.3A10.86,10.86,0,0,0,65.16,65.14V10.86A10.86,10.86,0,0,0,54.3,0H10.86A10.86,10.86,0,0,0,0,10.86ZM43.44,54.29H21.72V21.71H43.44Z"/>
+                <path fill="#242930" d="M70.59,10.86V21.71H92.31V76H114V0H81.45A10.86,10.86,0,0,0,70.59,10.86Z"/>
+                <path fill="#ef0c0c" d="M119.46,0h10.86a10.86,10.86,0,0,1,10.86,10.86V21.71a0,0,0,0,1,0,0H119.46a0,0,0,0,1,0,0V0A0,0,0,0,1,119.46,0Z"/>
+                <path fill="#7b8287" d="M200.44,54.28a14.85,14.85,0,0,1-6.51-1.4,15.92,15.92,0,0,1-5-3.68A16.88,16.88,0,0,1,185.67,44a16.43,16.43,0,0,1-1.15-6.06,16,16,0,0,1,1.2-6.11,16.23,16.23,0,0,1,3.34-5.18,16.46,16.46,0,0,1,5.09-3.57,15.39,15.39,0,0,1,6.43-1.34,14.86,14.86,0,0,1,6.51,1.41,15.86,15.86,0,0,1,5,3.71,16.85,16.85,0,0,1,3.21,5.24,16.6,16.6,0,0,1,1.13,6,16,16,0,0,1-1.2,6.1,16.23,16.23,0,0,1-8.39,8.78A15.21,15.21,0,0,1,200.44,54.28ZM192.07,38a11.77,11.77,0,0,0,.55,3.6,9.46,9.46,0,0,0,1.6,3.09,7.94,7.94,0,0,0,2.65,2.18,7.81,7.81,0,0,0,3.62.81,7.7,7.7,0,0,0,3.71-.86,8,8,0,0,0,2.62-2.24,9.53,9.53,0,0,0,1.56-3.12,12.2,12.2,0,0,0,.52-3.55,12.08,12.08,0,0,0-.54-3.6,9,9,0,0,0-1.63-3.07,8.06,8.06,0,0,0-2.64-2.13,7.85,7.85,0,0,0-3.6-.79,7.67,7.67,0,0,0-3.69.84,8.08,8.08,0,0,0-2.62,2.19,9.3,9.3,0,0,0-1.59,3.1A12.55,12.55,0,0,0,192.07,38Z"/>
+                <path fill="#7b8287" d="M238.74,35.65V54h-7.42V21.9h5.79l15,18.86V21.9h7.42V54h-6Z"/>
+                <path fill="#7b8287" d="M298.87,47.5V54H276.29V21.9h22.17v6.51H283.71v6.24h12.67v6H283.71V47.5Z"/>
+                <path fill="#7b8287" d="M360.13,28.41h-9.77V54h-7.42V28.41h-9.82V21.9h27Z"/>
+                <path fill="#7b8287" d="M396.13,47.5V54H373.55V21.9h22.17v6.51H381v6.24h12.67v6H381V47.5Z"/>
+                <path fill="#7b8287" d="M409,37.68a16.22,16.22,0,0,1,1.08-5.76,15.79,15.79,0,0,1,3.17-5.14,16,16,0,0,1,5.07-3.66,15.7,15.7,0,0,1,6.79-1.41,15.27,15.27,0,0,1,7.85,1.95,12.68,12.68,0,0,1,4.95,5.07l-5.7,4a6.55,6.55,0,0,0-1.38-2.11A7.59,7.59,0,0,0,429,29.25a7.69,7.69,0,0,0-2-.73,11,11,0,0,0-2-.2,7.73,7.73,0,0,0-3.71.86,8.08,8.08,0,0,0-2.62,2.22A9.24,9.24,0,0,0,417,34.47a12.57,12.57,0,0,0-.5,3.48,11.61,11.61,0,0,0,.59,3.67,9.72,9.72,0,0,0,1.7,3.12,8.31,8.31,0,0,0,2.67,2.15,7.62,7.62,0,0,0,3.51.79,8.76,8.76,0,0,0,2.05-.25,8,8,0,0,0,2-.77,7.39,7.39,0,0,0,1.79-1.35,6.43,6.43,0,0,0,1.31-2.06l6.06,3.57A9.44,9.44,0,0,1,436.09,50a13.22,13.22,0,0,1-3.28,2.35,17.78,17.78,0,0,1-8,1.94,14.4,14.4,0,0,1-6.4-1.42,16.2,16.2,0,0,1-5-3.78,17.27,17.27,0,0,1-3.26-5.34A16.66,16.66,0,0,1,409,37.68Z"/>
+                <path fill="#7b8287" d="M480,21.9V54h-7.42V40.85H459.77V54h-7.42V21.9h7.42V34.34h12.81V21.9Z"/>
+              </svg>
+            </div>
+            <div class="login-app-name">VTS Portal</div>
+            <div class="login-app-sub">Mobilni portal za radne naloge</div>
+          </div>
+
+          <div class="login-card">
+            <div>
+              <div class="login-field-label">Registracija vozila</div>
+              <div class="login-field-input">ZG 1234 AB</div>
+              <div class="login-hint" style="margin-top:6px">Unesite bez crtica i razmaka</div>
+            </div>
+            <button class="btn-login">
+              <span>🔍</span> Prijava
+            </button>
+          </div>
+
+          <div class="login-footer">VTS Portal v2.0 · EKO-FLOR PLUS d.o.o.</div>
+        </div>
+        <div class="phone-home-bar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ EKRAN 2: DASHBOARD ══════════ -->
+  <div class="phone-wrap">
+    <div class="phone-label">② Dashboard</div>
+    <div class="phone-frame">
+      <div class="phone-notch">
+        <div class="notch-cam"></div>
+        <div class="notch-speaker"></div>
+        <div class="notch-cam"></div>
+      </div>
+      <div class="phone-screen">
+        <div class="status-bar">
+          <span class="status-time">09:41</span>
+          <div class="status-icons">
+            <span>●●●</span><span>WiFi</span><span>🔋</span>
+          </div>
+        </div>
+
+        <div class="dash-hero">
+          <div class="dash-greeting">Dobro jutro,</div>
+          <div class="dash-name">Ivan Horvat</div>
+          <div class="dash-meta">
+            <div class="dash-chip">🚛 ZG 1234 AB</div>
+            <div class="dash-chip">📅 Uto, 12.5.</div>
+            <div class="dash-chip red">● Aktivan</div>
+          </div>
+        </div>
+
+        <div class="scroll-area" style="gap:10px">
+          <div class="kpi-row">
+            <div class="kpi-card kpi-red">
+              <div class="kpi-value">8</div>
+              <div class="kpi-label">Ukupno</div>
+            </div>
+            <div class="kpi-card kpi-green">
+              <div class="kpi-value">5</div>
+              <div class="kpi-label">Potpisano</div>
+            </div>
+            <div class="kpi-card kpi-amber">
+              <div class="kpi-value">3</div>
+              <div class="kpi-label">Preostalo</div>
+            </div>
+          </div>
+
+          <div class="progress-card">
+            <div class="progress-top">
+              <div class="progress-label">Dnevni napredak</div>
+              <div class="progress-pct">63%</div>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" style="width:63%"></div>
+            </div>
+          </div>
+
+          <div class="section-title">Sljedeći nalozi</div>
+
+          <div class="nalog-mini">
+            <div class="nalog-mini-dot" style="background:#F59E0B"></div>
+            <div class="nalog-mini-body">
+              <div class="nalog-mini-title">KONZUM d.o.o.</div>
+              <div class="nalog-mini-sub">📍 Ilica 242, Zagreb</div>
+            </div>
+            <div class="nalog-mini-badge" style="background:#FFFBEB;color:#D97706">U tijeku</div>
+          </div>
+
+          <div class="nalog-mini">
+            <div class="nalog-mini-dot" style="background:#3B82F6"></div>
+            <div class="nalog-mini-body">
+              <div class="nalog-mini-title">STUDENAC d.o.o.</div>
+              <div class="nalog-mini-sub">📍 Vlaška 78, Zagreb</div>
+            </div>
+            <div class="nalog-mini-badge" style="background:#EFF6FF;color:#2563EB">Planiran</div>
+          </div>
+
+          <div class="nalog-mini">
+            <div class="nalog-mini-dot" style="background:#3B82F6"></div>
+            <div class="nalog-mini-body">
+              <div class="nalog-mini-title">TOMMY d.o.o.</div>
+              <div class="nalog-mini-sub">📍 Bauerova 12, Zagreb</div>
+            </div>
+            <div class="nalog-mini-badge" style="background:#EFF6FF;color:#2563EB">Planiran</div>
+          </div>
+
+          <div class="section-title">Nedavno završeno</div>
+
+          <div class="nalog-mini" style="opacity:0.75">
+            <div class="nalog-mini-dot" style="background:#10B981"></div>
+            <div class="nalog-mini-body">
+              <div class="nalog-mini-title">SPAR Hrvatska d.o.o.</div>
+              <div class="nalog-mini-sub">📍 Ozaljska 105, Zagreb · 08:15</div>
+            </div>
+            <div class="nalog-mini-badge" style="background:#F0FDF4;color:#16A34A">✅ Pot.</div>
+          </div>
+        </div>
+
+        <div class="bottom-nav">
+          <div class="nav-item active">
+            <div class="nav-icon">🏠</div>
+            Početna
+          </div>
+          <div class="nav-item">
+            <div class="nav-icon">📋</div>
+            Nalozi
+          </div>
+          <div class="nav-item">
+            <div class="nav-icon">📅</div>
+            Raspored
+          </div>
+          <div class="nav-item">
+            <div class="nav-icon">🔔</div>
+            <div class="nav-badge">3</div>
+            Obavijesti
+          </div>
+        </div>
+        <div class="phone-home-bar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ EKRAN 3: RASPORED ══════════ -->
+  <div class="phone-wrap">
+    <div class="phone-label">③ Raspored</div>
+    <div class="phone-frame">
+      <div class="phone-notch">
+        <div class="notch-cam"></div>
+        <div class="notch-speaker"></div>
+        <div class="notch-cam"></div>
+      </div>
+      <div class="phone-screen">
+        <div class="status-bar">
+          <span class="status-time">09:41</span>
+          <div class="status-icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
+        </div>
+        <div class="app-header">
+          <div class="app-header-left">
+            <div class="app-header-title">Raspored</div>
+            <div class="app-header-sub">Tjedan 12.5. – 18.5.2025.</div>
+          </div>
+          <div class="app-header-actions">
+            <div class="icon-btn">📅</div>
+          </div>
+        </div>
+
+        <div class="cal-strip">
+          <div class="cal-month">Svibanj 2025</div>
+          <div class="cal-days">
+            <div class="cal-day">
+              <div class="cal-day-name">Pon</div>
+              <div class="cal-day-num">12</div>
+              <div class="cal-dot"></div>
+            </div>
+            <div class="cal-day today">
+              <div class="cal-day-name">Uto</div>
+              <div class="cal-day-num">13</div>
+              <div class="cal-dot"></div>
+            </div>
+            <div class="cal-day has-event">
+              <div class="cal-day-name">Sri</div>
+              <div class="cal-day-num">14</div>
+              <div class="cal-dot"></div>
+            </div>
+            <div class="cal-day">
+              <div class="cal-day-name">Čet</div>
+              <div class="cal-day-num">15</div>
+            </div>
+            <div class="cal-day has-event">
+              <div class="cal-day-name">Pet</div>
+              <div class="cal-day-num">16</div>
+              <div class="cal-dot"></div>
+            </div>
+            <div class="cal-day">
+              <div class="cal-day-name">Sub</div>
+              <div class="cal-day-num" style="color:#6B7280">17</div>
+            </div>
+            <div class="cal-day">
+              <div class="cal-day-name">Ned</div>
+              <div class="cal-day-num" style="color:#6B7280">18</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="scroll-area">
+          <div class="section-title">Utorak, 13. svibnja</div>
+
+          <div class="timeline-item">
+            <div class="timeline-accent" style="background:#10B981"></div>
+            <div class="timeline-body">
+              <div class="timeline-row">
+                <div>
+                  <div class="timeline-time">06:30 – 07:45</div>
+                  <div class="timeline-title">RN-2025-0341</div>
+                </div>
+                <div class="timeline-badge tl-done">✅ Potpisan</div>
+              </div>
+              <div class="timeline-partner">KONZUM d.o.o.</div>
+              <div class="timeline-addr">📍 Ilica 242, Zagreb</div>
+            </div>
+          </div>
+
+          <div class="timeline-gap">
+            <div class="tg-line"></div>
+            <div class="tg-text">45 min pauza</div>
+            <div class="tg-line"></div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-accent" style="background:#F59E0B"></div>
+            <div class="timeline-body">
+              <div class="timeline-row">
+                <div>
+                  <div class="timeline-time">08:30 – sada</div>
+                  <div class="timeline-title">RN-2025-0342</div>
+                </div>
+                <div class="timeline-badge tl-active">⏳ Aktivan</div>
+              </div>
+              <div class="timeline-partner">SPAR Hrvatska d.o.o.</div>
+              <div class="timeline-addr">📍 Ozaljska 105, Zagreb</div>
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-accent" style="background:#3B82F6"></div>
+            <div class="timeline-body">
+              <div class="timeline-row">
+                <div>
+                  <div class="timeline-time">10:15 – 11:30</div>
+                  <div class="timeline-title">RN-2025-0343</div>
+                </div>
+                <div class="timeline-badge tl-plan">Planiran</div>
+              </div>
+              <div class="timeline-partner">STUDENAC d.o.o.</div>
+              <div class="timeline-addr">📍 Vlaška 78, Zagreb</div>
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-accent" style="background:#3B82F6"></div>
+            <div class="timeline-body">
+              <div class="timeline-row">
+                <div>
+                  <div class="timeline-time">12:00 – 13:00</div>
+                  <div class="timeline-title">RN-2025-0344</div>
+                </div>
+                <div class="timeline-badge tl-plan">Planiran</div>
+              </div>
+              <div class="timeline-partner">TOMMY d.o.o.</div>
+              <div class="timeline-addr">📍 Bauerova 12, Zagreb</div>
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-accent" style="background:#3B82F6"></div>
+            <div class="timeline-body">
+              <div class="timeline-row">
+                <div>
+                  <div class="timeline-time">14:30 – 15:45</div>
+                  <div class="timeline-title">RN-2025-0345</div>
+                </div>
+                <div class="timeline-badge tl-plan">Planiran</div>
+              </div>
+              <div class="timeline-partner">INTERSPAR d.o.o.</div>
+              <div class="timeline-addr">📍 Heinzelova 60, Zagreb</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bottom-nav">
+          <div class="nav-item">
+            <div class="nav-icon">🏠</div>
+            Početna
+          </div>
+          <div class="nav-item">
+            <div class="nav-icon">📋</div>
+            Nalozi
+          </div>
+          <div class="nav-item active">
+            <div class="nav-icon">📅</div>
+            Raspored
+          </div>
+          <div class="nav-item">
+            <div class="nav-icon">🔔</div>
+            <div class="nav-badge">3</div>
+            Obavijesti
+          </div>
+        </div>
+        <div class="phone-home-bar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ EKRAN 4: OBAVIJESTI ══════════ -->
+  <div class="phone-wrap">
+    <div class="phone-label">④ Obavijesti</div>
+    <div class="phone-frame">
+      <div class="phone-notch">
+        <div class="notch-cam"></div>
+        <div class="notch-speaker"></div>
+        <div class="notch-cam"></div>
+      </div>
+      <div class="phone-screen">
+        <div class="status-bar">
+          <span class="status-time">09:41</span>
+          <div class="status-icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
+        </div>
+        <div class="app-header">
+          <div class="app-header-left">
+            <div class="app-header-title">Obavijesti</div>
+            <div class="app-header-sub">3 nepročitane poruke</div>
+          </div>
+          <div class="app-header-actions">
+            <div class="icon-btn" title="Označi sve pročitanim">✓✓</div>
+          </div>
+        </div>
+
+        <div class="notif-tabs">
+          <div class="notif-tab active">
+            Sve <span class="notif-count">3</span>
+          </div>
+          <div class="notif-tab">
+            Nalozi <span class="notif-count grey">5</span>
+          </div>
+          <div class="notif-tab">
+            Sustav <span class="notif-count grey">1</span>
+          </div>
+        </div>
+
+        <div class="scroll-area">
+
+          <div class="notif-card">
+            <!-- Nepročitana: hitno -->
+            <div class="notif-item unread">
+              <div class="notif-unread-dot"></div>
+              <div class="notif-icon-wrap ni-red">⚠️</div>
+              <div class="notif-body">
+                <div class="notif-title">Promjena rute – hitno</div>
+                <div class="notif-msg">Dispečer je izmijenio rutu za RN-0343. Promijenjena adresa isporuke.</div>
+                <div class="notif-time">Upravo · Dispečer</div>
+              </div>
+            </div>
+
+            <!-- Nepročitana: novi nalog -->
+            <div class="notif-item unread">
+              <div class="notif-unread-dot"></div>
+              <div class="notif-icon-wrap ni-blue">📋</div>
+              <div class="notif-body">
+                <div class="notif-title">Novi radni nalog</div>
+                <div class="notif-msg">Dodan nalog RN-2025-0346 za poslijepodne – LIDL Žitnjak.</div>
+                <div class="notif-time">Prije 12 min · Sustav</div>
+              </div>
+            </div>
+
+            <!-- Nepročitana: podsjetnik -->
+            <div class="notif-item unread">
+              <div class="notif-unread-dot"></div>
+              <div class="notif-icon-wrap ni-amber">⏰</div>
+              <div class="notif-body">
+                <div class="notif-title">Podsjetnik: sljedeća dostava</div>
+                <div class="notif-msg">Za 30 minuta kreće isporuka na Vlaška 78. Provjerite robu.</div>
+                <div class="notif-time">Prije 20 min · Sustav</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-title">Starije</div>
+
+          <div class="notif-card">
+            <div class="notif-item">
+              <div class="notif-icon-wrap ni-green">✅</div>
+              <div class="notif-body">
+                <div class="notif-title">Nalog potpisan</div>
+                <div class="notif-msg">RN-2025-0341 uspješno potpisan i zatvoren.</div>
+                <div class="notif-time">Danas 07:48 · Sustav</div>
+              </div>
+            </div>
+            <div class="notif-item">
+              <div class="notif-icon-wrap ni-blue">📢</div>
+              <div class="notif-body">
+                <div class="notif-title">Važna obavijest kompanije</div>
+                <div class="notif-msg">Sutra je redovni servis vozila ZG 1234 AB u 13:00h.</div>
+                <div class="notif-time">Jučer 16:30 · Admin</div>
+              </div>
+            </div>
+            <div class="notif-item">
+              <div class="notif-icon-wrap ni-green">✅</div>
+              <div class="notif-body">
+                <div class="notif-title">Nepravilnost riješena</div>
+                <div class="notif-msg">Nepravilnost na RN-2025-0338 je pregledana i zatvorena.</div>
+                <div class="notif-time">Jučer 11:20 · Dispečer</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="bottom-nav">
+          <div class="nav-item">
+            <div class="nav-icon">🏠</div>
+            Početna
+          </div>
+          <div class="nav-item">
+            <div class="nav-icon">📋</div>
+            Nalozi
+          </div>
+          <div class="nav-item">
+            <div class="nav-icon">📅</div>
+            Raspored
+          </div>
+          <div class="nav-item active">
+            <div class="nav-icon">🔔</div>
+            Obavijesti
+          </div>
+        </div>
+        <div class="phone-home-bar"></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end screens-row -->
+
+<!-- ══════════ DESIGN TOKENS ══════════ -->
+<div class="tokens-section">
+  <div class="tokens-title">🎨 Design Tokens – Paleta boja</div>
+  <div class="tokens-grid">
+    <div class="token-chip">
+      <div class="token-swatch" style="background:#EF0C0C"></div>
+      <div><div class="token-name">--red (primarna)</div><div class="token-hex">#EF0C0C</div></div>
+    </div>
+    <div class="token-chip">
+      <div class="token-swatch" style="background:#242930"></div>
+      <div><div class="token-name">--dark (header)</div><div class="token-hex">#242930</div></div>
+    </div>
+    <div class="token-chip">
+      <div class="token-swatch" style="background:#7B8287"></div>
+      <div><div class="token-name">--grey</div><div class="token-hex">#7B8287</div></div>
+    </div>
+    <div class="token-chip">
+      <div class="token-swatch" style="background:#F1F5F9"></div>
+      <div><div class="token-name">--bg</div><div class="token-hex">#F1F5F9</div></div>
+    </div>
+    <div class="token-chip">
+      <div class="token-swatch" style="background:#10B981"></div>
+      <div><div class="token-name">--green (potpisan)</div><div class="token-hex">#10B981</div></div>
+    </div>
+    <div class="token-chip">
+      <div class="token-swatch" style="background:#F59E0B"></div>
+      <div><div class="token-name">--amber (u tijeku)</div><div class="token-hex">#F59E0B</div></div>
+    </div>
+    <div class="token-chip">
+      <div class="token-swatch" style="background:#3B82F6"></div>
+      <div><div class="token-name">--blue (planiran)</div><div class="token-hex">#3B82F6</div></div>
+    </div>
+    <div class="token-chip">
+      <div class="token-swatch" style="background:#EF0C0C; opacity:0.15; border: 1px solid #EF0C0C"></div>
+      <div><div class="token-name">--red-light</div><div class="token-hex">#EF0C0C 15%</div></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

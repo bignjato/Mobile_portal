@@ -1,0 +1,579 @@
+{
+  "vozila": [
+    {
+      "id": "V1",
+      "registracija": "KR902OC",
+      "naziv": "Vozilo KR 902 OC"
+    },
+    {
+      "id": "V2",
+      "registracija": "ZG3917JP",
+      "naziv": "Vozilo ZG 3917 JP / ZG 7450 JR"
+    },
+    {
+      "id": "V3",
+      "registracija": "ZG9639JH",
+      "naziv": "Vozilo ZG 9639 JH"
+    },
+    {
+      "id": "V4",
+      "registracija": "ZG2498GG",
+      "naziv": "Vozilo ZG 2498 GG"
+    },
+    {
+      "id": "V5",
+      "registracija": "ZG7716DZ",
+      "naziv": "Vozilo ZG 7716 DZ"
+    },
+    {
+      "id": "V6",
+      "registracija": "ZG9290IF",
+      "naziv": "Vozilo ZG 9290 IF"
+    },
+    {
+      "id": "V7",
+      "registracija": "ZG6581KN",
+      "naziv": "Vozilo ZG 6581 KN"
+    }
+  ],
+  "vozaci": [
+    {
+      "id": "D1",
+      "ime": "Neven",
+      "prezime": "Bogović",
+      "voziloId": "V1"
+    },
+    {
+      "id": "D2",
+      "ime": "Kurtušić",
+      "prezime": "",
+      "voziloId": "V2"
+    },
+    {
+      "id": "D3",
+      "ime": "Rihter",
+      "prezime": "",
+      "voziloId": "V3"
+    },
+    {
+      "id": "D4",
+      "ime": "Bošnjak",
+      "prezime": "",
+      "voziloId": "V4"
+    },
+    {
+      "id": "D5",
+      "ime": "Vlahovac",
+      "prezime": "",
+      "voziloId": "V5"
+    },
+    {
+      "id": "D6",
+      "ime": "Berišić",
+      "prezime": "",
+      "voziloId": "V6"
+    },
+    {
+      "id": "D7",
+      "ime": "Mateo",
+      "prezime": "Matošević",
+      "voziloId": "V7"
+    }
+  ],
+  "radniNalozi": [
+    {
+      "id": "26043672",
+      "brojRN": "26043672",
+      "interniBroj": "2515/20",
+      "datumUsluge": "2026-05-11",
+      "voziloId": "V1",
+      "vozacId": "D1",
+      "status": "POTPISAN",
+      "partner": {
+        "naziv": "VALENTIĆ d.o.o.",
+        "adresa": "Savska cesta 1A",
+        "mjesto": "Sesvete",
+        "oib": "49316961381"
+      },
+      "lokacija": {
+        "naziv": "VALENTIĆ d.o.o.",
+        "adresa": "Savska cesta 1A",
+        "mjesto": "Sesvete",
+        "lat": 45.8194,
+        "lng": 16.1053
+      },
+      "stavke": [
+        {
+          "rbr": 1,
+          "sifraArtikla": "USI-11715",
+          "nazivRobe": "Usluge industrija - odvoz i zbrinjavanje",
+          "tipSpremnika": "PRESS_KONTEJNER",
+          "kolicina": 1,
+          "jedMjere": "usl"
+        },
+        {
+          "rbr": 2,
+          "sifraArtikla": "R115001",
+          "nazivRobe": "1.04 Ambalažni karton - ambalaža od papira i kartona",
+          "tipSpremnika": "PRESS_KONTEJNER",
+          "kolicina": 2000,
+          "jedMjere": "kg"
+        }
+      ],
+      "napomena": "",
+      "vrijemeDolaska": "2026-05-11T20:37:39.106Z",
+      "gpsDolazak": "45.703326,15.992487",
+      "potpis": "data:image/png;base64,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",
+      "potpisPartner": "Boris",
+      "vrijemePotpisa": "2026-05-11T20:38:44.744Z"
+    },
+    {
+      "id": "26043897",
+      "brojRN": "26043897",
+      "interniBroj": "",
+      "datumUsluge": "2026-05-11",
+      "voziloId": "V2",
+      "vozacId": "D2",
+      "status": "PLANIRAN",
+      "partner": {
+        "naziv": "EKO-FLOR PLUS d.o.o. za komunalne usluge i trgovinu",
+        "adresa": "Mokrice 180c",
+        "mjesto": "Oroslavje",
+        "oib": "50730247993"
+      },
+      "lokacija": {
+        "naziv": "Skladište Oroslavje redovno",
+        "adresa": "Mokrice 180C",
+        "mjesto": "Oroslavje",
+        "lat": 46.0322,
+        "lng": 15.8556
+      },
+      "stavke": [
+        {
+          "rbr": 1,
+          "sifraArtikla": "R105004",
+          "nazivRobe": "1.02 Miješani papir",
+          "tipSpremnika": "",
+          "kolicina": 10680,
+          "jedMjere": "kg"
+        }
+      ],
+      "napomena": "MSP: Skladište Zagreb redovno"
+    },
+    {
+      "id": "26041906",
+      "brojRN": "26041906",
+      "interniBroj": "2401100001775",
+      "datumUsluge": "2026-05-11",
+      "voziloId": "V3",
+      "vozacId": "D3",
+      "status": "PLANIRAN",
+      "partner": {
+        "naziv": "CollectBox d.o.o.",
+        "adresa": "Puškarićeva ulica 15",
+        "mjesto": "Lučko",
+        "oib": "65070560305"
+      },
+      "lokacija": {
+        "naziv": "CollectBox d.o.o.",
+        "adresa": "Puškarićeva ulica 15",
+        "mjesto": "Lučko",
+        "lat": 45.7731,
+        "lng": 15.8872
+      },
+      "stavke": [
+        {
+          "rbr": 1,
+          "sifraArtikla": "R255013",
+          "nazivRobe": "LDPE 98/2",
+          "tipSpremnika": "",
+          "kolicina": 20,
+          "jedMjere": "kg"
+        }
+      ],
+      "napomena": "TEDI ŠKORPIKOVA"
+    },
+    {
+      "id": "26041795",
+      "brojRN": "26041795",
+      "interniBroj": "2401100001802",
+      "datumUsluge": "2026-05-11",
+      "voziloId": "V3",
+      "vozacId": "D3",
+      "status": "PLANIRAN",
+      "partner": {
+        "naziv": "CollectBox d.o.o.",
+        "adresa": "Puškarićeva ulica 15",
+        "mjesto": "Lučko",
+        "oib": "65070560305"
+      },
+      "lokacija": {
+        "naziv": "CollectBox d.o.o.",
+        "adresa": "Puškarićeva ulica 15",
+        "mjesto": "Lučko",
+        "lat": 45.7731,
+        "lng": 15.8872
+      },
+      "stavke": [
+        {
+          "rbr": 1,
+          "sifraArtikla": "R115005",
+          "nazivRobe": "1.04 Ambalažni karton",
+          "tipSpremnika": "",
+          "kolicina": 280,
+          "jedMjere": "kg"
+        }
+      ],
+      "napomena": "TEDI DS RP"
+    },
+    {
+      "id": "26041851",
+      "brojRN": "26041851",
+      "interniBroj": "2501100002535",
+      "datumUsluge": "2026-05-11",
+      "voziloId": "V4",
+      "vozacId": "D4",
+      "status": "PLANIRAN",
+      "partner": {
+        "naziv": "VAL-SOL d.o.o.",
+        "adresa": "Karlovačka 46",
+        "mjesto": "Sesvete",
+        "oib": "59681711914"
+      },
+      "lokacija": {
+        "naziv": "VAL-SOL d.o.o.",
+        "adresa": "Karlovačka 46",
+        "mjesto": "Sesvete",
+        "lat": 45.8103,
+        "lng": 16.0897
+      },
+      "stavke": [
+        {
+          "rbr": 1,
+          "sifraArtikla": "R115005",
+          "nazivRobe": "1.04 Ambalažni karton",
+          "tipSpremnika": "",
+          "kolicina": 1400,
+          "jedMjere": "kg"
+        }
+      ],
+      "napomena": ""
+    },
+    {
+      "id": "26046112",
+      "brojRN": "26046112",
+      "interniBroj": "2501100000759",
+      "datumUsluge": "2026-05-11",
+      "voziloId": "V5",
+      "vozacId": "D5",
+      "status": "PLANIRAN",
+      "partner": {
+        "naziv": "D.N.T. STIRO-GRUPA d.o.o.",
+        "adresa": "Pavlenski put 5G",
+        "mjesto": "Zagreb",
+        "oib": "49623249725"
+      },
+      "lokacija": {
+        "naziv": "D.N.T. STIRO-GRUPA d.o.o.",
+        "adresa": "Pavlenski put 5G",
+        "mjesto": "Zagreb",
+        "lat": 45.8456,
+        "lng": 16.0234
+      },
+      "stavke": [
+        {
+          "rbr": 1,
+          "sifraArtikla": "R235001",
+          "nazivRobe": "Otpadna plastična ambalaža (Stiropor)",
+          "tipSpremnika": "",
+          "kolicina": 280,
+          "jedMjere": "kg"
+        }
+      ],
+      "napomena": "VLAHOVAC"
+    },
+    {
+      "id": "26048740",
+      "brojRN": "26048740",
+      "interniBroj": "2501100000720",
+      "datumUsluge": "2026-05-11",
+      "voziloId": "V6",
+      "vozacId": "D6",
+      "status": "PLANIRAN",
+      "partner": {
+        "naziv": "B-Fort reciklaža d.o.o.",
+        "adresa": "Slavonska avenija 51",
+        "mjesto": "Zagreb",
+        "oib": "20841964185"
+      },
+      "lokacija": {
+        "naziv": "B-Fort reciklaža d.o.o.",
+        "adresa": "Slavonska avenija 51",
+        "mjesto": "Zagreb",
+        "lat": 45.8031,
+        "lng": 16.0412
+      },
+      "stavke": [
+        {
+          "rbr": 1,
+          "sifraArtikla": "R905011",
+          "nazivRobe": "Građevinski otpad (Miješani građevinski otpad i otpad od rušenja objekata)",
+          "tipSpremnika": "",
+          "kolicina": 2260,
+          "jedMjere": "kg"
+        },
+        {
+          "rbr": 2,
+          "sifraArtikla": "USI-11610",
+          "nazivRobe": "Usluge industrija - zbrinjavanje - kilogram",
+          "tipSpremnika": "",
+          "kolicina": 2260,
+          "jedMjere": "kg"
+        }
+      ],
+      "napomena": ""
+    },
+    {
+      "id": "26045832",
+      "brojRN": "26045832",
+      "interniBroj": "0293/21",
+      "datumUsluge": "2026-05-11",
+      "voziloId": "V7",
+      "vozacId": "D7",
+      "status": "PLANIRAN",
+      "partner": {
+        "naziv": "KONZUM plus d.o.o.",
+        "adresa": "Ulica Marijana Čavića 1/a",
+        "mjesto": "Zagreb",
+        "oib": "62226620908"
+      },
+      "lokacija": {
+        "naziv": "KONZUM plus d.o.o. / P-201",
+        "adresa": "Bjelovarska 48B",
+        "mjesto": "Sesvete",
+        "lat": 45.8341,
+        "lng": 16.1012
+      },
+      "stavke": [
+        {
+          "rbr": 1,
+          "sifraArtikla": "R115001",
+          "nazivRobe": "1.04 Ambalažni karton - ambalaža od papira i kartona",
+          "tipSpremnika": "32S",
+          "kolicina": 2560,
+          "jedMjere": "kg"
+        },
+        {
+          "rbr": 2,
+          "sifraArtikla": "USI-11610",
+          "nazivRobe": "Usluge industrija - zbrinjavanje - kilogram",
+          "tipSpremnika": "32S",
+          "kolicina": 2560,
+          "jedMjere": "kg"
+        },
+        {
+          "rbr": 3,
+          "sifraArtikla": "USI-11310",
+          "nazivRobe": "Usluge industrija - prijevoz - usluga",
+          "tipSpremnika": "32S",
+          "kolicina": 1,
+          "jedMjere": "usl"
+        }
+      ],
+      "napomena": ""
+    },
+    {
+      "id": "",
+      "brojRN": "",
+      "interniBroj": "",
+      "datumUsluge": "2026-05-11",
+      "voziloId": null,
+      "vozacId": null,
+      "status": "PLANIRAN",
+      "partner": {
+        "naziv": "",
+        "adresa": "",
+        "mjesto": "",
+        "oib": ""
+      },
+      "lokacija": {
+        "naziv": "",
+        "adresa": "",
+        "mjesto": "",
+        "lat": 45.815,
+        "lng": 15.9819
+      },
+      "stavke": [],
+      "napomena": ""
+    },
+    {
+      "id": "",
+      "brojRN": "",
+      "interniBroj": "",
+      "datumUsluge": "2026-05-11",
+      "voziloId": null,
+      "vozacId": null,
+      "status": "PLANIRAN",
+      "partner": {
+        "naziv": "",
+        "adresa": "",
+        "mjesto": "",
+        "oib": ""
+      },
+      "lokacija": {
+        "naziv": "",
+        "adresa": "",
+        "mjesto": "",
+        "lat": 45.815,
+        "lng": 15.9819
+      },
+      "stavke": [],
+      "napomena": ""
+    },
+    {
+      "id": "",
+      "brojRN": "",
+      "interniBroj": "",
+      "datumUsluge": "2026-05-11",
+      "voziloId": null,
+      "vozacId": null,
+      "status": "PLANIRAN",
+      "partner": {
+        "naziv": "",
+        "adresa": "",
+        "mjesto": "",
+        "oib": ""
+      },
+      "lokacija": {
+        "naziv": "",
+        "adresa": "",
+        "mjesto": "",
+        "lat": 45.815,
+        "lng": 15.9819
+      },
+      "stavke": [],
+      "napomena": ""
+    },
+    {
+      "id": "",
+      "brojRN": "",
+      "interniBroj": "",
+      "datumUsluge": "2026-05-11",
+      "voziloId": null,
+      "vozacId": null,
+      "status": "PLANIRAN",
+      "partner": {
+        "naziv": "",
+        "adresa": "",
+        "mjesto": "",
+        "oib": ""
+      },
+      "lokacija": {
+        "naziv": "",
+        "adresa": "",
+        "mjesto": "",
+        "lat": 45.815,
+        "lng": 15.9819
+      },
+      "stavke": [],
+      "napomena": ""
+    },
+    {
+      "id": "",
+      "brojRN": "",
+      "interniBroj": "",
+      "datumUsluge": "2026-05-11",
+      "voziloId": null,
+      "vozacId": null,
+      "status": "PLANIRAN",
+      "partner": {
+        "naziv": "",
+        "adresa": "",
+        "mjesto": "",
+        "oib": ""
+      },
+      "lokacija": {
+        "naziv": "",
+        "adresa": "",
+        "mjesto": "",
+        "lat": 45.815,
+        "lng": 15.9819
+      },
+      "stavke": [],
+      "napomena": ""
+    },
+    {
+      "id": "",
+      "brojRN": "",
+      "interniBroj": "",
+      "datumUsluge": "2026-05-11",
+      "voziloId": null,
+      "vozacId": null,
+      "status": "PLANIRAN",
+      "partner": {
+        "naziv": "",
+        "adresa": "",
+        "mjesto": "",
+        "oib": ""
+      },
+      "lokacija": {
+        "naziv": "",
+        "adresa": "",
+        "mjesto": "",
+        "lat": 45.815,
+        "lng": 15.9819
+      },
+      "stavke": [],
+      "napomena": ""
+    },
+    {
+      "id": "",
+      "brojRN": "",
+      "interniBroj": "",
+      "datumUsluge": "2026-05-11",
+      "voziloId": null,
+      "vozacId": null,
+      "status": "PLANIRAN",
+      "partner": {
+        "naziv": "",
+        "adresa": "",
+        "mjesto": "",
+        "oib": ""
+      },
+      "lokacija": {
+        "naziv": "",
+        "adresa": "",
+        "mjesto": "",
+        "lat": 45.815,
+        "lng": 15.9819
+      },
+      "stavke": [],
+      "napomena": ""
+    },
+    {
+      "id": "",
+      "brojRN": "",
+      "interniBroj": "",
+      "datumUsluge": "2026-05-11",
+      "voziloId": null,
+      "vozacId": null,
+      "status": "PLANIRAN",
+      "partner": {
+        "naziv": "",
+        "adresa": "",
+        "mjesto": "",
+        "oib": ""
+      },
+      "lokacija": {
+        "naziv": "",
+        "adresa": "",
+        "mjesto": "",
+        "lat": 45.815,
+        "lng": 15.9819
+      },
+      "stavke": [],
+      "napomena": ""
+    }
+  ],
+  "potpisi": []
+}

@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VTS Admin Portal – UI Dizajn</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red: #EF0C0C;
+    --dark: #242930;
+    --dark2: #2d3540;
+    --grey: #7B8287;
+    --bg: #F1F5F9;
+    --white: #ffffff;
+    --border: #E2E8F0;
+    --text: #0F172A;
+    --text2: #64748B;
+    --green: #10B981;
+    --amber: #F59E0B;
+    --blue: #3B82F6;
+    --purple: #8B5CF6;
+    --sidebar-w: 220px;
+    --header-h: 56px;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #CBD5E1;
+    color: var(--text);
+    padding: 30px 20px 60px;
+    font-size: 13px;
+  }
+
+  /* ── PAGE TITLE ─────────────── */
+  .page-title { text-align: center; margin-bottom: 40px; }
+  .page-title h1 { font-size: 26px; font-weight: 800; color: var(--dark); }
+  .page-title p  { font-size: 13px; color: var(--grey); margin-top: 4px; }
+
+  /* ── SCREEN FRAME ───────────── */
+  .screen-wrap {
+    background: #1a1a28;
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    margin-bottom: 50px;
+  }
+  .screen-topbar {
+    background: #111;
+    border-radius: 6px 6px 0 0;
+    height: 28px;
+    display: flex; align-items: center; padding: 0 12px; gap: 7px;
+  }
+  .tb-dot { width: 11px; height: 11px; border-radius: 50%; }
+  .tb-url {
+    flex: 1; background: #2a2a2a; border-radius: 4px;
+    height: 16px; margin: 0 12px;
+    display: flex; align-items: center; padding: 0 8px;
+    font-size: 10px; color: #888;
+  }
+  .browser-body {
+    border-radius: 0 0 6px 6px;
+    overflow: hidden;
+  }
+
+  /* ── APP LAYOUT ─────────────── */
+  .app-layout {
+    display: flex;
+    height: 680px;
+    background: var(--bg);
+  }
+
+  /* ── SIDEBAR ────────────────── */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--dark);
+    display: flex; flex-direction: column;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .sidebar-logo {
+    padding: 16px 18px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .logo-mark {
+    width: 32px; height: 32px;
+    background: var(--red);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 900; color: white;
+    flex-shrink: 0;
+  }
+  .logo-text-wrap {}
+  .logo-text { color: white; font-size: 14px; font-weight: 800; line-height: 1.1; }
+  .logo-sub  { color: #6B7280; font-size: 10px; margin-top: 1px; }
+
+  .sidebar-nav { flex: 1; padding: 10px 0; overflow-y: auto; }
+  .sidebar-nav::-webkit-scrollbar { display: none; }
+
+  .nav-section-label {
+    font-size: 9px; font-weight: 700; color: #4B5563;
+    text-transform: uppercase; letter-spacing: 0.8px;
+    padding: 10px 18px 5px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 18px; cursor: pointer;
+    font-size: 12px; font-weight: 600; color: #9CA3AF;
+    border-left: 3px solid transparent;
+    transition: all 0.15s;
+  }
+  .nav-item.active {
+    background: rgba(239,12,12,0.1);
+    color: white;
+    border-left-color: var(--red);
+  }
+  .nav-item:hover:not(.active) { background: rgba(255,255,255,0.04); color: #D1D5DB; }
+  .nav-icon { font-size: 16px; width: 18px; text-align: center; }
+  .nav-badge {
+    margin-left: auto;
+    background: var(--red); color: white;
+    font-size: 9px; font-weight: 800;
+    min-width: 16px; height: 16px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 4px;
+  }
+
+  .sidebar-user {
+    padding: 12px 16px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .user-avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--red); display: flex; align-items: center;
+    justify-content: center; font-size: 11px; font-weight: 800; color: white;
+    flex-shrink: 0;
+  }
+  .user-name  { color: white; font-size: 11px; font-weight: 700; }
+  .user-role  { color: #6B7280; font-size: 10px; }
+  .user-logout { margin-left: auto; color: #6B7280; font-size: 14px; cursor: pointer; }
+
+  /* ── MAIN CONTENT ───────────── */
+  .main-content {
+    flex: 1; display: flex; flex-direction: column; overflow: hidden;
+  }
+
+  /* ── TOP HEADER ─────────────── */
+  .top-header {
+    background: white;
+    height: var(--header-h);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; padding: 0 22px;
+    gap: 14px; flex-shrink: 0;
+  }
+  .top-header-title { font-size: 17px; font-weight: 800; color: var(--text); }
+  .top-header-spacer { flex: 1; }
+  .search-box {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 7px 12px;
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; color: var(--text2); width: 200px;
+  }
+  .top-chip {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 6px 12px;
+    font-size: 12px; font-weight: 600; color: var(--text2);
+    cursor: pointer; display: flex; align-items: center; gap: 5px;
+  }
+  .top-chip.red { background: var(--red); color: white; border-color: var(--red); }
+  .notif-btn {
+    position: relative; width: 34px; height: 34px;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; cursor: pointer;
+  }
+  .notif-dot {
+    position: absolute; top: 6px; right: 7px;
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--red); border: 1.5px solid white;
+  }
+
+  /* ── SCROLL BODY ────────────── */
+  .content-body {
+    flex: 1; overflow-y: auto; overflow-x: hidden;
+    padding: 20px 22px;
+    display: flex; flex-direction: column; gap: 18px;
+  }
+  .content-body::-webkit-scrollbar { width: 4px; }
+  .content-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  /* ── SECTION TITLE ──────────── */
+  .section-title {
+    font-size: 11px; font-weight: 700; color: var(--text2);
+    text-transform: uppercase; letter-spacing: 0.6px;
+  }
+  .section-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .section-link {
+    font-size: 11px; color: var(--blue); font-weight: 600; cursor: pointer;
+  }
+
+  /* ── KPI CARDS ──────────────── */
+  .kpi-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+  }
+  .kpi-card {
+    background: white; border-radius: 12px;
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+  }
+  .kpi-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .kpi-icon {
+    width: 32px; height: 32px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; font-size: 15px;
+  }
+  .kpi-trend {
+    font-size: 10px; font-weight: 700; border-radius: 20px;
+    padding: 2px 7px; display: flex; align-items: center; gap: 2px;
+  }
+  .kpi-trend.up   { background: #F0FDF4; color: #16A34A; }
+  .kpi-trend.down { background: #FEF2F2; color: #DC2626; }
+  .kpi-value { font-size: 26px; font-weight: 900; color: var(--text); line-height: 1; }
+  .kpi-label { font-size: 11px; color: var(--text2); margin-top: 3px; }
+
+  /* ── TWO COLUMN ─────────────── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .three-col { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; }
+
+  /* ── CARD ───────────────────── */
+  .card {
+    background: white; border-radius: 12px;
+    border: 1px solid var(--border);
+    padding: 16px;
+  }
+
+  /* ── TABLE ──────────────────── */
+  .data-table { width: 100%; border-collapse: collapse; }
+  .data-table th {
+    font-size: 10px; font-weight: 700; color: var(--text2);
+    text-transform: uppercase; letter-spacing: 0.5px;
+    padding: 0 10px 8px; text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .data-table td {
+    padding: 9px 10px; font-size: 12px;
+    border-bottom: 1px solid var(--bg);
+    vertical-align: middle;
+  }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: #FAFBFF; }
+
+  .badge {
+    display: inline-flex; align-items: center;
+    padding: 3px 8px; border-radius: 20px;
+    font-size: 10px; font-weight: 700; white-space: nowrap;
+  }
+  .b-green  { background: #F0FDF4; color: #16A34A; }
+  .b-amber  { background: #FFFBEB; color: #D97706; }
+  .b-blue   { background: #EFF6FF; color: #2563EB; }
+  .b-red    { background: #FEF2F2; color: #DC2626; }
+  .b-grey   { background: #F1F5F9; color: #64748B; }
+
+  .avatar-sm {
+    width: 26px; height: 26px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 800; color: white;
+    flex-shrink: 0; vertical-align: middle; margin-right: 6px;
+  }
+
+  /* ── CHART MOCK ─────────────── */
+  .chart-bars {
+    display: flex; align-items: flex-end; gap: 6px;
+    height: 80px; padding: 0 4px;
+  }
+  .chart-bar-wrap {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; gap: 4px;
+  }
+  .chart-bar {
+    width: 100%; border-radius: 4px 4px 0 0;
+    min-height: 4px;
+  }
+  .chart-bar-label { font-size: 9px; color: var(--text2); }
+
+  /* ── ACTIVITY LIST ──────────── */
+  .activity-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--bg);
+  }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    flex-shrink: 0; margin-top: 4px;
+  }
+  .activity-text { font-size: 12px; color: var(--text); line-height: 1.4; flex: 1; }
+  .activity-time { font-size: 10px; color: #94A3B8; white-space: nowrap; }
+
+  /* ── STAT ROW ───────────────── */
+  .stat-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 0; border-bottom: 1px solid var(--bg);
+    font-size: 12px;
+  }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-label { color: var(--text2); display: flex; align-items: center; gap: 6px; }
+  .stat-value { font-weight: 700; color: var(--text); }
+
+  /* ── VEHICLE CARD ───────────── */
+  .vehicle-card {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; border-radius: 8px;
+    border: 1px solid var(--border); background: white;
+    margin-bottom: 6px; cursor: pointer;
+  }
+  .vehicle-card:hover { border-color: #CBD5E1; background: #FAFBFF; }
+  .vehicle-plate {
+    font-size: 12px; font-weight: 800; color: var(--dark);
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 5px; padding: 3px 7px; white-space: nowrap;
+  }
+  .vehicle-info { flex: 1; min-width: 0; }
+  .vehicle-name { font-size: 12px; font-weight: 700; }
+  .vehicle-sub  { font-size: 10px; color: var(--text2); margin-top: 1px; }
+
+  /* ── MAP MOCK ───────────────── */
+  .map-mock {
+    background: linear-gradient(135deg, #e8f0e8 0%, #d4e4d4 50%, #e0eae0 100%);
+    border-radius: 8px; height: 120px;
+    position: relative; overflow: hidden;
+    border: 1px solid #C7D9C7;
+  }
+  .map-grid-h, .map-grid-v {
+    position: absolute; background: rgba(0,0,0,0.06);
+  }
+  .map-grid-h { height: 1px; width: 100%; }
+  .map-grid-v { width: 1px; height: 100%; }
+  .map-pin {
+    position: absolute; transform: translate(-50%, -100%);
+    font-size: 18px; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
+  }
+  .map-road-h {
+    position: absolute; background: rgba(255,255,255,0.7);
+    height: 6px; width: 100%;
+  }
+  .map-road-v {
+    position: absolute; background: rgba(255,255,255,0.7);
+    width: 6px; height: 100%;
+  }
+
+  /* ── PROGRESS BAR ───────────── */
+  .prog-bar-bg { background: var(--bg); border-radius: 99px; height: 6px; overflow: hidden; margin-top: 4px; }
+  .prog-bar-fill { height: 100%; border-radius: 99px; }
+
+  /* ─── SCREEN LABELS ─────────── */
+  .screen-label {
+    text-align: center; font-size: 12px; font-weight: 700;
+    color: #64748B; text-transform: uppercase; letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+
+  /* ── TABS ───────────────────── */
+  .tab-bar {
+    display: flex; gap: 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 14px;
+  }
+  .tab {
+    padding: 8px 14px; font-size: 12px; font-weight: 700;
+    color: var(--text2); cursor: pointer;
+    border-bottom: 2px solid transparent; margin-bottom: -1px;
+  }
+  .tab.active { color: var(--red); border-bottom-color: var(--red); }
+
+  /* ── FILTER ROW ─────────────── */
+  .filter-row {
+    display: flex; gap: 8px; align-items: center;
+    margin-bottom: 12px; flex-wrap: wrap;
+  }
+  .filter-chip {
+    padding: 5px 11px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+    border: 1px solid var(--border); background: white;
+    color: var(--text2); cursor: pointer;
+  }
+  .filter-chip.active { background: var(--dark); color: white; border-color: var(--dark); }
+  .filter-spacer { flex: 1; }
+  .filter-select {
+    padding: 5px 10px; border-radius: 8px;
+    border: 1px solid var(--border); background: white;
+    font-size: 11px; color: var(--text2); font-family: inherit;
+  }
+
+  .btn-sm {
+    padding: 6px 12px; border-radius: 8px;
+    font-size: 11px; font-weight: 700; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 5px;
+    border: none;
+  }
+  .btn-red { background: var(--red); color: white; }
+  .btn-outline { background: white; color: var(--text); border: 1px solid var(--border); }
+
+  /* ─── SEPARATOR ─────────────── */
+  .screen-separator {
+    height: 2px; background: var(--border);
+    margin: 30px 0; border-radius: 2px;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-title">
+  <h1>VTS Admin Portal – Web UI Dizajn</h1>
+  <p>Dispečerski i upravljački panel · OneTech · 2025</p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     EKRAN 1: DASHBOARD
+═══════════════════════════════════════════════ -->
+<div class="screen-label">① Dashboard – Dnevni pregled</div>
+<div class="screen-wrap">
+  <div class="screen-topbar">
+    <div class="tb-dot" style="background:#FF5F57"></div>
+    <div class="tb-dot" style="background:#FEBC2E"></div>
+    <div class="tb-dot" style="background:#28C840"></div>
+    <div class="tb-url">🔒 vts.eko-flor.hr/admin</div>
+  </div>
+  <div class="browser-body">
+    <div class="app-layout">
+
+      <!-- SIDEBAR -->
+      <div class="sidebar">
+        <div class="sidebar-logo">
+          <div class="logo-mark">OT</div>
+          <div class="logo-text-wrap">
+            <div class="logo-text">VTS Admin</div>
+            <div class="logo-sub">EKO-FLOR PLUS</div>
+          </div>
+        </div>
+        <div class="sidebar-nav">
+          <div class="nav-section-label">Navigacija</div>
+          <div class="nav-item active"><span class="nav-icon">🏠</span> Dashboard</div>
+          <div class="nav-item"><span class="nav-icon">📋</span> Radni nalozi <span class="nav-badge">12</span></div>
+          <div class="nav-item"><span class="nav-icon">🚛</span> Vozači i vozila</div>
+          <div class="nav-item"><span class="nav-icon">🏢</span> Partneri</div>
+          <div class="nav-section-label">Izvještaji</div>
+          <div class="nav-item"><span class="nav-icon">📊</span> Statistike</div>
+          <div class="nav-item"><span class="nav-icon">📁</span> Izvozi</div>
+          <div class="nav-section-label">Sustav</div>
+          <div class="nav-item"><span class="nav-icon">⚙️</span> Postavke</div>
+          <div class="nav-item"><span class="nav-icon">👥</span> Korisnici</div>
+        </div>
+        <div class="sidebar-user">
+          <div class="user-avatar">MK</div>
+          <div>
+            <div class="user-name">Maja Kovač</div>
+            <div class="user-role">Dispečer</div>
+          </div>
+          <div class="user-logout">⏏</div>
+        </div>
+      </div>
+
+      <!-- MAIN -->
+      <div class="main-content">
+        <div class="top-header">
+          <div class="top-header-title">Dobro jutro, Maja 👋</div>
+          <div class="top-header-spacer"></div>
+          <div class="search-box">🔍 Pretraži naloge, vozila...</div>
+          <div class="top-chip">📅 Uto, 13. 5. 2025.</div>
+          <div class="notif-btn">🔔<div class="notif-dot"></div></div>
+          <div class="top-chip red">+ Novi nalog</div>
+        </div>
+
+        <div class="content-body">
+
+          <!-- KPI ROW -->
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <div class="kpi-icon" style="background:#FEF2F2">📋</div>
+                <div class="kpi-trend up">↑ 8%</div>
+              </div>
+              <div class="kpi-value">47</div>
+              <div class="kpi-label">Naloga danas</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <div class="kpi-icon" style="background:#F0FDF4">✅</div>
+                <div class="kpi-trend up">↑ 12%</div>
+              </div>
+              <div class="kpi-value">31</div>
+              <div class="kpi-label">Potpisano</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <div class="kpi-icon" style="background:#EFF6FF">🚛</div>
+                <div class="kpi-trend up">↑ 2</div>
+              </div>
+              <div class="kpi-value">14</div>
+              <div class="kpi-label">Vozila aktiv.</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <div class="kpi-icon" style="background:#FFFBEB">⚠️</div>
+                <div class="kpi-trend down">↑ 3</div>
+              </div>
+              <div class="kpi-value">4</div>
+              <div class="kpi-label">Nepravilnosti</div>
+            </div>
+          </div>
+
+          <!-- CHART + ACTIVITY -->
+          <div class="three-col">
+            <div class="card">
+              <div class="section-row">
+                <div class="section-title">Nalozi po danima – ovaj tjedan</div>
+                <div class="section-link">Detalji →</div>
+              </div>
+              <div class="chart-bars">
+                <div class="chart-bar-wrap">
+                  <div class="chart-bar" style="height:55px;background:#EF0C0C;opacity:0.5"></div>
+                  <div class="chart-bar-label">Pon</div>
+                </div>
+                <div class="chart-bar-wrap">
+                  <div class="chart-bar" style="height:70px;background:#EF0C0C"></div>
+                  <div class="chart-bar-label">Uto</div>
+                </div>
+                <div class="chart-bar-wrap">
+                  <div class="chart-bar" style="height:45px;background:#EF0C0C;opacity:0.4"></div>
+                  <div class="chart-bar-label">Sri</div>
+                </div>
+                <div class="chart-bar-wrap">
+                  <div class="chart-bar" style="height:60px;background:#EF0C0C;opacity:0.4"></div>
+                  <div class="chart-bar-label">Čet</div>
+                </div>
+                <div class="chart-bar-wrap">
+                  <div class="chart-bar" style="height:38px;background:#EF0C0C;opacity:0.4"></div>
+                  <div class="chart-bar-label">Pet</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:14px;margin-top:12px;padding-top:10px;border-top:1px solid var(--bg)">
+                <div style="font-size:11px;color:var(--text2)">Prosječno: <b style="color:var(--text)">43 / dan</b></div>
+                <div style="font-size:11px;color:var(--text2)">Tjedan: <b style="color:var(--text)">262</b></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="section-row">
+                <div class="section-title">Aktivnost</div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot" style="background:var(--green)"></div>
+                <div class="activity-text">Ivan Horvat potpisao RN-0341</div>
+                <div class="activity-time">08:47</div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot" style="background:var(--amber)"></div>
+                <div class="activity-text">Nepravilnost prijavljena – ZG 5678 CD</div>
+                <div class="activity-time">08:32</div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot" style="background:var(--blue)"></div>
+                <div class="activity-text">Novi nalog kreiran za KONZUM d.o.o.</div>
+                <div class="activity-time">08:15</div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot" style="background:var(--green)"></div>
+                <div class="activity-text">Marko Babić potpisao RN-0338</div>
+                <div class="activity-time">07:58</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- VOZACI STATUS -->
+          <div class="card">
+            <div class="section-row">
+              <div class="section-title">Vozači na terenu danas</div>
+              <div class="section-link">Svi vozači →</div>
+            </div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Vozač</th>
+                  <th>Vozilo</th>
+                  <th>Nalozi</th>
+                  <th>Status</th>
+                  <th>Zadnja aktivnost</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="avatar-sm" style="background:#EF0C0C">IH</span>Ivan Horvat</td>
+                  <td><span style="font-weight:700;font-size:11px;background:var(--bg);padding:2px 6px;border-radius:4px">ZG 1234 AB</span></td>
+                  <td><span class="badge b-green">5/8</span></td>
+                  <td><span class="badge b-amber">⏳ Na terenu</span></td>
+                  <td style="color:var(--text2)">09:38</td>
+                </tr>
+                <tr>
+                  <td><span class="avatar-sm" style="background:#3B82F6">MB</span>Marko Babić</td>
+                  <td><span style="font-weight:700;font-size:11px;background:var(--bg);padding:2px 6px;border-radius:4px">ZG 5678 CD</span></td>
+                  <td><span class="badge b-green">7/7</span></td>
+                  <td><span class="badge b-green">✅ Završio</span></td>
+                  <td style="color:var(--text2)">09:12</td>
+                </tr>
+                <tr>
+                  <td><span class="avatar-sm" style="background:#8B5CF6">AK</span>Ana Knežević</td>
+                  <td><span style="font-weight:700;font-size:11px;background:var(--bg);padding:2px 6px;border-radius:4px">ZG 9012 EF</span></td>
+                  <td><span class="badge b-blue">2/6</span></td>
+                  <td><span class="badge b-amber">⏳ Na terenu</span></td>
+                  <td style="color:var(--text2)">09:41</td>
+                </tr>
+                <tr>
+                  <td><span class="avatar-sm" style="background:#10B981">JP</span>Josip Perić</td>
+                  <td><span style="font-weight:700;font-size:11px;background:var(--bg);padding:2px 6px;border-radius:4px">ZG 3456 GH</span></td>
+                  <td><span class="badge b-red">0/5</span></td>
+                  <td><span class="badge b-red">⚠ Nepravilnost</span></td>
+                  <td style="color:var(--text2)">08:55</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     EKRAN 2: RADNI NALOZI
+═══════════════════════════════════════════════ -->
+<div class="screen-label">② Radni nalozi</div>
+<div class="screen-wrap">
+  <div class="screen-topbar">
+    <div class="tb-dot" style="background:#FF5F57"></div>
+    <div class="tb-dot" style="background:#FEBC2E"></div>
+    <div class="tb-dot" style="background:#28C840"></div>
+    <div class="tb-url">🔒 vts.eko-flor.hr/admin/nalozi</div>
+  </div>
+  <div class="browser-body">
+    <div class="app-layout">
+
+      <div class="sidebar">
+        <div class="sidebar-logo">
+          <div class="logo-mark">OT</div>
+          <div class="logo-text-wrap">
+            <div class="logo-text">VTS Admin</div>
+            <div class="logo-sub">EKO-FLOR PLUS</div>
+          </div>
+        </div>
+        <div class="sidebar-nav">
+          <div class="nav-section-label">Navigacija</div>
+          <div class="nav-item"><span class="nav-icon">🏠</span> Dashboard</div>
+          <div class="nav-item active"><span class="nav-icon">📋</span> Radni nalozi <span class="nav-badge">12</span></div>
+          <div class="nav-item"><span class="nav-icon">🚛</span> Vozači i vozila</div>
+          <div class="nav-item"><span class="nav-icon">🏢</span> Partneri</div>
+          <div class="nav-section-label">Izvještaji</div>
+          <div class="nav-item"><span class="nav-icon">📊</span> Statistike</div>
+          <div class="nav-item"><span class="nav-icon">📁</span> Izvozi</div>
+          <div class="nav-section-label">Sustav</div>
+          <div class="nav-item"><span class="nav-icon">⚙️</span> Postavke</div>
+          <div class="nav-item"><span class="nav-icon">👥</span> Korisnici</div>
+        </div>
+        <div class="sidebar-user">
+          <div class="user-avatar">MK</div>
+          <div>
+            <div class="user-name">Maja Kovač</div>
+            <div class="user-role">Dispečer</div>
+          </div>
+          <div class="user-logout">⏏</div>
+        </div>
+      </div>
+
+      <div class="main-content">
+        <div class="top-header">
+          <div class="top-header-title">Radni nalozi</div>
+          <div class="top-header-spacer"></div>
+          <div class="search-box">🔍 Traži nalog, partnera...</div>
+          <div class="top-chip">📥 Izvoz</div>
+          <div class="top-chip red">+ Novi nalog</div>
+        </div>
+
+        <div class="content-body">
+
+          <div class="tab-bar">
+            <div class="tab active">Danas (47)</div>
+            <div class="tab">Tjedan (262)</div>
+            <div class="tab">Svi nalozi</div>
+          </div>
+
+          <div class="filter-row">
+            <div class="filter-chip active">Svi</div>
+            <div class="filter-chip">Planirani (16)</div>
+            <div class="filter-chip">U tijeku (8)</div>
+            <div class="filter-chip">Potpisani (19)</div>
+            <div class="filter-chip">Nepravilnost (4)</div>
+            <div class="filter-spacer"></div>
+            <select class="filter-select"><option>Svi vozači</option></select>
+            <select class="filter-select"><option>Sva vozila</option></select>
+          </div>
+
+          <div class="card" style="padding:0;overflow:hidden">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="padding-left:16px">Broj RN</th>
+                  <th>Partner</th>
+                  <th>Adresa</th>
+                  <th>Vozač</th>
+                  <th>Vozilo</th>
+                  <th>Status</th>
+                  <th>Vrijeme</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="padding-left:16px;font-weight:800">RN-2025-0342</td>
+                  <td>SPAR Hrvatska d.o.o.</td>
+                  <td style="color:var(--text2)">Ozaljska 105, Zagreb</td>
+                  <td><span class="avatar-sm" style="background:#EF0C0C">IH</span>Ivan Horvat</td>
+                  <td><span style="font-weight:700;font-size:11px;background:var(--bg);padding:2px 6px;border-radius:4px">ZG 1234 AB</span></td>
+                  <td><span class="badge b-amber">⏳ U tijeku</span></td>
+                  <td style="color:var(--text2)">08:30</td>
+                  <td><button class="btn-sm btn-outline">Otvori</button></td>
+                </tr>
+                <tr>
+                  <td style="padding-left:16px;font-weight:800">RN-2025-0341</td>
+                  <td>KONZUM d.o.o.</td>
+                  <td style="color:var(--text2)">Ilica 242, Zagreb</td>
+                  <td><span class="avatar-sm" style="background:#EF0C0C">IH</span>Ivan Horvat</td>
+                  <td><span style="font-weight:700;font-size:11px;background:var(--bg);padding:2px 6px;border-radius:4px">ZG 1234 AB</span></td>
+                  <td><span class="badge b-green">✅ Potpisan</span></td>
+                  <td style="color:var(--text2)">07:45</td>
+                  <td><button class="btn-sm btn-outline">Otvori</button></td>
+                </tr>
+                <tr>
+                  <td style="padding-left:16px;font-weight:800">RN-2025-0340</td>
+                  <td>TOMMY d.o.o.</td>
+                  <td style="color:var(--text2)">Bauerova 12, Zagreb</td>
+                  <td><span class="avatar-sm" style="background:#8B5CF6">AK</span>Ana Knežević</td>
+                  <td><span style="font-weight:700;font-size:11px;background:var(--bg);padding:2px 6px;border-radius:4px">ZG 9012 EF</span></td>
+                  <td><span class="badge b-green">✅ Potpisan</span></td>
+                  <td style="color:var(--text2)">09:20</td>
+                  <td><button class="btn-sm btn-outline">Otvori</button></td>
+                </tr>
+                <tr>
+                  <td style="padding-left:16px;font-weight:800">RN-2025-0339</td>
+                  <td>INTERSPAR d.o.o.</td>
+                  <td style="color:var(--text2)">Heinzelova 60, Zagreb</td>
+                  <td><span class="avatar-sm" style="background:#10B981">JP</span>Josip Perić</td>
+                  <td><span style="font-weight:700;font-size:11px;background:var(--bg);padding:2px 6px;border-radius:4px">ZG 3456 GH</span></td>
+                  <td><span class="badge b-red">⚠ Nepravilnost</span></td>
+                  <td style="color:var(--text2)">08:55</td>
+                  <td><button class="btn-sm btn-red">Pregled</button></td>
+                </tr>
+                <tr>
+                  <td style="padding-left:16px;font-weight:800">RN-2025-0338</td>
+                  <td>STUDENAC d.o.o.</td>
+                  <td style="color:var(--text2)">Vlaška 78, Zagreb</td>
+                  <td><span class="avatar-sm" style="background:#3B82F6">MB</span>Marko Babić</td>
+                  <td><span style="font-weight:700;font-size:11px;background:var(--bg);padding:2px 6px;border-radius:4px">ZG 5678 CD</span></td>
+                  <td><span class="badge b-blue">📅 Planiran</span></td>
+                  <td style="color:var(--text2)">10:15</td>
+                  <td><button class="btn-sm btn-outline">Otvori</button></td>
+                </tr>
+                <tr>
+                  <td style="padding-left:16px;font-weight:800">RN-2025-0337</td>
+                  <td>LIDL Hrvatska d.o.o.</td>
+                  <td style="color:var(--text2)">Žitnjak bb, Zagreb</td>
+                  <td><span class="avatar-sm" style="background:#3B82F6">MB</span>Marko Babić</td>
+                  <td><span style="font-weight:700;font-size:11px;background:var(--bg);padding:2px 6px;border-radius:4px">ZG 5678 CD</span></td>
+                  <td><span class="badge b-blue">📅 Planiran</span></td>
+                  <td style="color:var(--text2)">11:30</td>
+                  <td><button class="btn-sm btn-outline">Otvori</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- PAGINATION -->
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--text2)">
+            <span>Prikazano 1–6 od 47</span>
+            <div style="display:flex;gap:4px">
+              <button class="btn-sm btn-outline" style="padding:4px 10px">‹</button>
+              <button class="btn-sm btn-outline" style="padding:4px 10px;background:var(--dark);color:white;border-color:var(--dark)">1</button>
+              <button class="btn-sm btn-outline" style="padding:4px 10px">2</button>
+              <button class="btn-sm btn-outline" style="padding:4px 10px">3</button>
+              <button class="btn-sm btn-outline" style="padding:4px 10px">›</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     EKRAN 3: VOZAČI I VOZILA
+═══════════════════════════════════════════════ -->
+<div class="screen-label">③ Vozači i vozila</div>
+<div class="screen-wrap">
+  <div class="screen-topbar">
+    <div class="tb-dot" style="background:#FF5F57"></div>
+    <div class="tb-dot" style="background:#FEBC2E"></div>
+    <div class="tb-dot" style="background:#28C840"></div>
+    <div class="tb-url">🔒 vts.eko-flor.hr/admin/vozaci</div>
+  </div>
+  <div class="browser-body">
+    <div class="app-layout">
+
+      <div class="sidebar">
+        <div class="sidebar-logo">
+          <div class="logo-mark">OT</div>
+          <div class="logo-text-wrap">
+            <div class="logo-text">VTS Admin</div>
+            <div class="logo-sub">EKO-FLOR PLUS</div>
+          </div>
+        </div>
+        <div class="sidebar-nav">
+          <div class="nav-section-label">Navigacija</div>
+          <div class="nav-item"><span class="nav-icon">🏠</span> Dashboard</div>
+          <div class="nav-item"><span class="nav-icon">📋</span> Radni nalozi</div>
+          <div class="nav-item active"><span class="nav-icon">🚛</span> Vozači i vozila</div>
+          <div class="nav-item"><span class="nav-icon">🏢</span> Partneri</div>
+          <div class="nav-section-label">Izvještaji</div>
+          <div class="nav-item"><span class="nav-icon">📊</span> Statistike</div>
+          <div class="nav-item"><span class="nav-icon">📁</span> Izvozi</div>
+          <div class="nav-section-label">Sustav</div>
+          <div class="nav-item"><span class="nav-icon">⚙️</span> Postavke</div>
+          <div class="nav-item"><span class="nav-icon">👥</span> Korisnici</div>
+        </div>
+        <div class="sidebar-user">
+          <div class="user-avatar">MK</div>
+          <div><div class="user-name">Maja Kovač</div><div class="user-role">Dispečer</div></div>
+          <div class="user-logout">⏏</div>
+        </div>
+      </div>
+
+      <div class="main-content">
+        <div class="top-header">
+          <div class="top-header-title">Vozači i vozila</div>
+          <div class="top-header-spacer"></div>
+          <div class="search-box">🔍 Traži vozača ili vozilo...</div>
+          <div class="top-chip red">+ Dodaj vozača</div>
+        </div>
+
+        <div class="content-body">
+
+          <div class="tab-bar">
+            <div class="tab active">Vozači (18)</div>
+            <div class="tab">Vozila (14)</div>
+            <div class="tab">Dodjele</div>
+          </div>
+
+          <div class="two-col">
+
+            <!-- VOZAČI LISTA -->
+            <div class="card" style="padding:0;overflow:hidden">
+              <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+                <div style="font-size:12px;font-weight:800">Aktivni vozači</div>
+                <div class="badge b-green">14 aktivnih</div>
+              </div>
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th style="padding-left:16px">Vozač</th>
+                    <th>Vozilo</th>
+                    <th>Nalozi</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="padding-left:16px"><span class="avatar-sm" style="background:#EF0C0C">IH</span>Ivan Horvat</td>
+                    <td><span style="font-size:11px;font-weight:700;background:var(--bg);padding:2px 6px;border-radius:4px">ZG 1234 AB</span></td>
+                    <td>5 / 8</td>
+                    <td><span class="badge b-amber">Na terenu</span></td>
+                  </tr>
+                  <tr>
+                    <td style="padding-left:16px"><span class="avatar-sm" style="background:#3B82F6">MB</span>Marko Babić</td>
+                    <td><span style="font-size:11px;font-weight:700;background:var(--bg);padding:2px 6px;border-radius:4px">ZG 5678 CD</span></td>
+                    <td>7 / 7</td>
+                    <td><span class="badge b-green">Završio</span></td>
+                  </tr>
+                  <tr>
+                    <td style="padding-left:16px"><span class="avatar-sm" style="background:#8B5CF6">AK</span>Ana Knežević</td>
+                    <td><span style="font-size:11px;font-weight:700;background:var(--bg);padding:2px 6px;border-radius:4px">ZG 9012 EF</span></td>
+                    <td>2 / 6</td>
+                    <td><span class="badge b-amber">Na terenu</span></td>
+                  </tr>
+                  <tr>
+                    <td style="padding-left:16px"><span class="avatar-sm" style="background:#10B981">JP</span>Josip Perić</td>
+                    <td><span style="font-size:11px;font-weight:700;background:var(--bg);padding:2px 6px;border-radius:4px">ZG 3456 GH</span></td>
+                    <td>0 / 5</td>
+                    <td><span class="badge b-red">Nepravilnost</span></td>
+                  </tr>
+                  <tr>
+                    <td style="padding-left:16px"><span class="avatar-sm" style="background:#F59E0B">TM</span>Tomislav Matić</td>
+                    <td><span style="font-size:11px;font-weight:700;background:var(--bg);padding:2px 6px;border-radius:4px">ZG 7890 IJ</span></td>
+                    <td>3 / 5</td>
+                    <td><span class="badge b-amber">Na terenu</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- DESNA KOLONA: vozilo detalj + mapa -->
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div class="card">
+                <div style="font-size:12px;font-weight:800;margin-bottom:12px">Vozilo – ZG 1234 AB</div>
+                <div style="display:flex;gap:12px;margin-bottom:12px">
+                  <div style="flex:1">
+                    <div class="stat-row">
+                      <span class="stat-label">Registracija</span>
+                      <span class="stat-value">ZG 1234 AB</span>
+                    </div>
+                    <div class="stat-row">
+                      <span class="stat-label">Model</span>
+                      <span class="stat-value">MAN TGS 26.440</span>
+                    </div>
+                    <div class="stat-row">
+                      <span class="stat-label">Godina</span>
+                      <span class="stat-value">2019.</span>
+                    </div>
+                    <div class="stat-row">
+                      <span class="stat-label">Vozač danas</span>
+                      <span class="stat-value">Ivan Horvat</span>
+                    </div>
+                    <div class="stat-row">
+                      <span class="stat-label">Tehnički pregled</span>
+                      <span class="stat-value" style="color:var(--green)">✓ 12/2025</span>
+                    </div>
+                  </div>
+                </div>
+                <!-- DNEVNI PROGRESS -->
+                <div style="font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Dnevni napredak</div>
+                <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
+                  <span>5 od 8 naloga</span>
+                  <span style="font-weight:700;color:var(--green)">63%</span>
+                </div>
+                <div class="prog-bar-bg">
+                  <div class="prog-bar-fill" style="width:63%;background:var(--green)"></div>
+                </div>
+              </div>
+
+              <!-- MAPA -->
+              <div class="card" style="padding:12px">
+                <div style="font-size:12px;font-weight:800;margin-bottom:8px">Lokacija vozila</div>
+                <div class="map-mock">
+                  <div class="map-road-h" style="top:40%"></div>
+                  <div class="map-road-h" style="top:70%"></div>
+                  <div class="map-road-v" style="left:30%"></div>
+                  <div class="map-road-v" style="left:65%"></div>
+                  <div class="map-grid-h" style="top:25%"></div>
+                  <div class="map-grid-h" style="top:55%"></div>
+                  <div class="map-grid-v" style="left:50%"></div>
+                  <div class="map-pin" style="left:52%;top:42%">🚛</div>
+                  <div class="map-pin" style="left:30%;top:72%">📍</div>
+                  <div class="map-pin" style="left:66%;top:72%">📍</div>
+                </div>
+                <div style="font-size:10px;color:var(--text2);margin-top:6px">🚛 ZG 1234 AB · Ozaljska 105 · Ažurirano: 09:41</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     EKRAN 4: PARTNERI
+═══════════════════════════════════════════════ -->
+<div class="screen-label">④ Partneri / Klijenti</div>
+<div class="screen-wrap">
+  <div class="screen-topbar">
+    <div class="tb-dot" style="background:#FF5F57"></div>
+    <div class="tb-dot" style="background:#FEBC2E"></div>
+    <div class="tb-dot" style="background:#28C840"></div>
+    <div class="tb-url">🔒 vts.eko-flor.hr/admin/partneri</div>
+  </div>
+  <div class="browser-body">
+    <div class="app-layout">
+
+      <div class="sidebar">
+        <div class="sidebar-logo">
+          <div class="logo-mark">OT</div>
+          <div class="logo-text-wrap">
+            <div class="logo-text">VTS Admin</div>
+            <div class="logo-sub">EKO-FLOR PLUS</div>
+          </div>
+        </div>
+        <div class="sidebar-nav">
+          <div class="nav-section-label">Navigacija</div>
+          <div class="nav-item"><span class="nav-icon">🏠</span> Dashboard</div>
+          <div class="nav-item"><span class="nav-icon">📋</span> Radni nalozi</div>
+          <div class="nav-item"><span class="nav-icon">🚛</span> Vozači i vozila</div>
+          <div class="nav-item active"><span class="nav-icon">🏢</span> Partneri</div>
+          <div class="nav-section-label">Izvještaji</div>
+          <div class="nav-item"><span class="nav-icon">📊</span> Statistike</div>
+          <div class="nav-item"><span class="nav-icon">📁</span> Izvozi</div>
+          <div class="nav-section-label">Sustav</div>
+          <div class="nav-item"><span class="nav-icon">⚙️</span> Postavke</div>
+          <div class="nav-item"><span class="nav-icon">👥</span> Korisnici</div>
+        </div>
+        <div class="sidebar-user">
+          <div class="user-avatar">MK</div>
+          <div><div class="user-name">Maja Kovač</div><div class="user-role">Dispečer</div></div>
+          <div class="user-logout">⏏</div>
+        </div>
+      </div>
+
+      <div class="main-content">
+        <div class="top-header">
+          <div class="top-header-title">Partneri i klijenti</div>
+          <div class="top-header-spacer"></div>
+          <div class="search-box">🔍 Traži partnera, lokaciju...</div>
+          <div class="top-chip">📥 Izvoz</div>
+          <div class="top-chip red">+ Novi partner</div>
+        </div>
+
+        <div class="content-body">
+
+          <div class="filter-row">
+            <div class="filter-chip active">Svi (84)</div>
+            <div class="filter-chip">Aktivni (71)</div>
+            <div class="filter-chip">Neaktivni (13)</div>
+            <div class="filter-spacer"></div>
+            <select class="filter-select"><option>Sve kategorije</option></select>
+          </div>
+
+          <div class="two-col">
+            <!-- PARTNER LISTA -->
+            <div class="card" style="padding:0;overflow:hidden">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th style="padding-left:16px">Partner</th>
+                    <th>Grad</th>
+                    <th>Nalozi MTD</th>
+                    <th>Status</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style="background:#F8FAFF">
+                    <td style="padding-left:16px">
+                      <div style="font-size:12px;font-weight:800">KONZUM d.o.o.</div>
+                      <div style="font-size:10px;color:var(--text2)">Maloprodaja</div>
+                    </td>
+                    <td>Zagreb</td>
+                    <td><span class="badge b-blue">124</span></td>
+                    <td><span class="badge b-green">Aktivan</span></td>
+                    <td><button class="btn-sm btn-outline">Otvori</button></td>
+                  </tr>
+                  <tr>
+                    <td style="padding-left:16px">
+                      <div style="font-size:12px;font-weight:800">SPAR Hrvatska d.o.o.</div>
+                      <div style="font-size:10px;color:var(--text2)">Maloprodaja</div>
+                    </td>
+                    <td>Zagreb</td>
+                    <td><span class="badge b-blue">98</span></td>
+                    <td><span class="badge b-green">Aktivan</span></td>
+                    <td><button class="btn-sm btn-outline">Otvori</button></td>
+                  </tr>
+                  <tr>
+                    <td style="padding-left:16px">
+                      <div style="font-size:12px;font-weight:800">TOMMY d.o.o.</div>
+                      <div style="font-size:10px;color:var(--text2)">Maloprodaja</div>
+                    </td>
+                    <td>Zagreb</td>
+                    <td><span class="badge b-blue">76</span></td>
+                    <td><span class="badge b-green">Aktivan</span></td>
+                    <td><button class="btn-sm btn-outline">Otvori</button></td>
+                  </tr>
+                  <tr>
+                    <td style="padding-left:16px">
+                      <div style="font-size:12px;font-weight:800">LIDL Hrvatska d.o.o.</div>
+                      <div style="font-size:10px;color:var(--text2)">Maloprodaja</div>
+                    </td>
+                    <td>Zagreb</td>
+                    <td><span class="badge b-blue">62</span></td>
+                    <td><span class="badge b-green">Aktivan</span></td>
+                    <td><button class="btn-sm btn-outline">Otvori</button></td>
+                  </tr>
+                  <tr>
+                    <td style="padding-left:16px">
+                      <div style="font-size:12px;font-weight:800">STUDENAC d.o.o.</div>
+                      <div style="font-size:10px;color:var(--text2)">Maloprodaja</div>
+                    </td>
+                    <td>Zagreb</td>
+                    <td><span class="badge b-blue">54</span></td>
+                    <td><span class="badge b-green">Aktivan</span></td>
+                    <td><button class="btn-sm btn-outline">Otvori</button></td>
+                  </tr>
+                  <tr>
+                    <td style="padding-left:16px">
+                      <div style="font-size:12px;font-weight:800">Pekarnica Mlinar d.o.o.</div>
+                      <div style="font-size:10px;color:var(--text2)">Prehrana</div>
+                    </td>
+                    <td>Zagreb</td>
+                    <td><span class="badge b-grey">8</span></td>
+                    <td><span class="badge b-grey">Neaktivan</span></td>
+                    <td><button class="btn-sm btn-outline">Otvori</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- DETALJ PARTNERA -->
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div class="card">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+                  <div style="width:42px;height:42px;border-radius:10px;background:#EFF6FF;display:flex;align-items:center;justify-content:center;font-size:20px">🏢</div>
+                  <div>
+                    <div style="font-size:14px;font-weight:800">KONZUM d.o.o.</div>
+                    <div style="font-size:11px;color:var(--text2)">Maloprodaja · 18 lokacija</div>
+                  </div>
+                  <span class="badge b-green" style="margin-left:auto">Aktivan</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">OIB</span>
+                  <span class="stat-value">12345678901</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Kontakt</span>
+                  <span class="stat-value">Ana Šimić</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Telefon</span>
+                  <span class="stat-value" style="color:var(--blue)">+385 1 234 5678</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Ugovor do</span>
+                  <span class="stat-value" style="color:var(--green)">31.12.2025.</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Nalozi ovaj mj.</span>
+                  <span class="stat-value">124</span>
+                </div>
+              </div>
+
+              <div class="card" style="padding:12px 16px">
+                <div style="font-size:11px;font-weight:800;margin-bottom:10px">Lokacije (18)</div>
+                <div class="vehicle-card">
+                  <div>📍</div>
+                  <div class="vehicle-info">
+                    <div class="vehicle-name">Ilica 242, Zagreb</div>
+                    <div class="vehicle-sub">Superm. 1 · 3 kante, 1 kontejner</div>
+                  </div>
+                  <span class="badge b-amber">Uto, Pet</span>
+                </div>
+                <div class="vehicle-card">
+                  <div>📍</div>
+                  <div class="vehicle-info">
+                    <div class="vehicle-name">Heinzelova 33, Zagreb</div>
+                    <div class="vehicle-sub">Superm. 2 · 5 kanti</div>
+                  </div>
+                  <span class="badge b-blue">Pon, Sri, Pet</span>
+                </div>
+                <div class="vehicle-card">
+                  <div>📍</div>
+                  <div class="vehicle-info">
+                    <div class="vehicle-name">Avenija Dubrovnik 16</div>
+                    <div class="vehicle-sub">Superm. 3 · 2 kante</div>
+                  </div>
+                  <span class="badge b-grey">Čet</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

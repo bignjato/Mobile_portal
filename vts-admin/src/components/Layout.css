@@ -1,0 +1,30 @@
+.app-layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.content-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 22px 24px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.content-body::-webkit-scrollbar { width: 5px; }
+.content-body::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
