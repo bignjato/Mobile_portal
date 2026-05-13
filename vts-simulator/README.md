@@ -40,9 +40,12 @@ node cli.js auto --vozilo=KR902OC --interval=3
 ## Ciklus simulacije
 
 1. Login (po registraciji vozila)
-2. Kreiranje radnog naloga (random partner, tip spremnika)
+2. **Kreiranje RN iz testnog predloška** (RN-Baza_test PDF-ovi koje je parsirao [parse_rn.py](../vts-api/parse_rn.py)) — kopira originalni partner, lokaciju, stavke i OIB, novi ID + današnji datum
 3. PATCH dolazak (GPS + timestamp)
 4. 80% → POST potpis · 20% → POST nepravilnost
+
+> Predlošci se učitavaju iz `GET /v1/radni-nalozi` i filtriraju po `brojRN` (7+ znamenki) i prisustvu OIB-a — to su nalozi parsirani iz PDF-ova u `RN-Baza_test/`.
+> Ako predložaka nema, prvo pokreni: `cd ../vts-api && python parse_rn.py`
 
 ## Konfiguracija
 

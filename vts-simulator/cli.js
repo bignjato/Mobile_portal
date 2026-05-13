@@ -36,38 +36,36 @@ async function login(registracija) {
   return api('/v1/auth/login', { method: 'POST', body: JSON.stringify({ registracija }) });
 }
 
+let _templatesCache = null;
+async function loadTemplates() {
+  if (_templatesCache) return _templatesCache;
+  const all = await api('/v1/radni-nalozi');
+  _templatesCache = all.filter(n => /^\d{7,}$/.test(n.brojRN) && n.partner?.oib);
+  if (!_templatesCache.length) {
+    throw new Error('Nema testnih predložaka. Pokreni `python parse_rn.py` u vts-api.');
+  }
+  return _templatesCache;
+}
+
 async function createNalog(vozilo, vozac) {
+  const templates = await loadTemplates();
+  const pool = templates.filter(t => t.voziloId === vozilo.id);
+  const tpl = (pool.length ? pool : templates)[Math.floor(Math.random() * (pool.length || templates.length))];
   const today = new Date().toISOString().split('T')[0];
-  const partneri = ['VALENTIĆ d.o.o.', 'TEST d.o.o.', 'KOMUNALAC', 'PLODINE', 'KONZUM'];
-  const tipovi = ['KANTA_120L', 'KANTA_240L', 'KONTEJNER_1100L', 'PRESS_KONTEJNER'];
   const body = {
+    brojRN: `SIM-${Date.now().toString().slice(-8)}`,
+    interniBroj: tpl.interniBroj,
     datumUsluge: today,
     voziloId: vozilo.id,
     vozacId: vozac.id,
-    partner: {
-      naziv: partneri[Math.floor(Math.random() * partneri.length)],
-      oib: String(Math.floor(10000000000 + Math.random() * 89999999999)),
-      adresa: `Ulica ${Math.ceil(Math.random() * 100)}`,
-      mjesto: 'Zagreb',
-    },
-    lokacija: {
-      naziv: 'Lokacija',
-      adresa: `Ulica ${Math.ceil(Math.random() * 100)}`,
-      mjesto: 'Zagreb',
-      lat: 45.8 + Math.random() * 0.1,
-      lng: 15.9 + Math.random() * 0.2,
-    },
-    stavke: [{
-      rbr: 1,
-      sifraArtikla: 'SIM-001',
-      nazivRobe: 'Simulirani odvoz',
-      tipSpremnika: tipovi[Math.floor(Math.random() * tipovi.length)],
-      kolicina: Math.ceil(Math.random() * 5),
-      jedMjere: 'kom',
-    }],
-    napomena: 'CLI simulator',
+    partner: tpl.partner,
+    lokacija: tpl.lokacija,
+    stavke: tpl.stavke,
+    napomena: `[SIM-CLI] iz predloška ${tpl.brojRN}`,
   };
-  return api('/v1/radni-nalozi', { method: 'POST', body: JSON.stringify(body) });
+  const created = await api('/v1/radni-nalozi', { method: 'POST', body: JSON.stringify(body) });
+  created._templateBrojRN = tpl.brojRN;
+  return created;
 }
 
 async function dolazak(id) {
@@ -109,7 +107,7 @@ async function runCycle() {
   console.log(`👤 ${session.vozac.punoIme} / ${vozilo.registracija}`);
 
   const nalog = await createNalog(vozilo, session.vozac);
-  console.log(`  ➕ Kreiran ${nalog.brojRN} (${nalog.partner.naziv})`);
+  console.log(`  ➕ Kreiran ${nalog.brojRN} ← predložak ${nalog._templateBrojRN} (${nalog.partner.naziv})`);
 
   await dolazak(nalog.id);
   console.log(`  📍 Dolazak`);

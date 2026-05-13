@@ -179,11 +179,25 @@
     </div>
 
     <div class="card">
+      <h2>📚 Testni predlošci (RN-Baza_test)</h2>
+      <div class="small">Stvarni radni nalozi parsirani iz PDF-ova — koriste se za simulaciju.</div>
+      <div class="row" style="margin-top:8px;">
+        <button class="ghost" onclick="loadTemplates()">↻ Učitaj predloške</button>
+        <button class="ghost" onclick="clearTemplateSel()">✕ Poništi</button>
+      </div>
+      <div id="templateList" class="nalog-list" style="margin-top:10px; max-height:200px;">
+        <div class="nalog-item muted">Klikni "Učitaj predloške"…</div>
+      </div>
+      <div id="templateSel" class="meta" style="margin-top:8px;">Predložak: <i>random iz baze</i></div>
+    </div>
+
+    <div class="card">
       <h2>⚙ Auto simulacija</h2>
-      <div class="small">Generira radne naloge i šalje cijeli životni ciklus u zadanom intervalu.</div>
+      <div class="small">Šalje cijeli životni ciklus (kreiranje → dolazak → potpis/nepravilnost) koristeći testne predloške iz RN-Baza_test.</div>
       <div class="auto-controls" style="margin-top:10px;">
         <label style="margin:0;">Interval (s)</label>
         <input type="number" id="autoInterval" value="5" min="1" style="width:80px;" />
+        <label style="margin:0;"><input type="checkbox" id="autoRotateVozilo" checked /> rotiraj vozilo</label>
         <button id="autoBtn" class="green" onclick="toggleAuto()">▶ Start</button>
       </div>
       <div id="autoStatus" class="meta"></div>
@@ -221,27 +235,9 @@
       <textarea id="nepravilnostOpis">Spremnik nije bio na lokaciji u dogovoreno vrijeme.</textarea>
       <button onclick="sendNepravilnost()">Pošalji nepravilnost</button>
 
-      <h3>➕ Kreiraj novi radni nalog</h3>
-      <div class="row">
-        <div><label>Partner</label><input id="newPartner" type="text" value="TEST PARTNER d.o.o." /></div>
-        <div><label>OIB</label><input id="newOib" type="text" value="12345678901" /></div>
-      </div>
-      <div class="row">
-        <div><label>Adresa</label><input id="newAdresa" type="text" value="Ilica 1" /></div>
-        <div><label>Mjesto</label><input id="newMjesto" type="text" value="Zagreb" /></div>
-      </div>
-      <div class="row">
-        <div><label>Tip spremnika</label>
-          <select id="newTip">
-            <option>KANTA_120L</option>
-            <option>KANTA_240L</option>
-            <option>KONTEJNER_1100L</option>
-            <option>PRESS_KONTEJNER</option>
-          </select>
-        </div>
-        <div><label>Količina</label><input id="newKolicina" type="number" value="3" /></div>
-      </div>
-      <button class="secondary" onclick="createNalog()">Kreiraj nalog</button>
+      <h3>➕ Kreiraj novi RN iz testnog predloška</h3>
+      <div class="small">Kopira odabrani predložak (ili random iz RN-Baza_test) — novi ID, današnji datum, originalni partner/lokacija/stavke.</div>
+      <button class="secondary" onclick="createNalogFromTemplate()" style="margin-top:8px;">Kreiraj iz predloška</button>
     </div>
 
     <div class="card">
@@ -260,9 +256,12 @@
     vozac: null,
     vozilo: null,
     vozila: [],
+    vozaci: [],
     nalozi: [],
     selectedNalogId: null,
-    auto: { running: false, timer: null, count: 0 },
+    templates: [],
+    selectedTemplateId: null,
+    auto: { running: false, timer: null, count: 0, voziloIdx: 0 },
   };
 
   // ───── helpers ─────
@@ -297,11 +296,13 @@
   async function pingApi() {
     const dot = $('apiDot'), st = $('apiStatus');
     try {
-      const r = await api('/v1/vozila');
+      const [vozila, vozaci] = await Promise.all([api('/v1/vozila'), api('/v1/vozaci')]);
       dot.className = 'dot ok';
-      st.textContent = `online (${r.length} vozila)`;
-      state.vozila = r;
+      st.textContent = `online (${vozila.length} vozila)`;
+      state.vozila = vozila;
+      state.vozaci = vozaci;
       renderVozila();
+      loadTemplates();
       return true;
     } catch (e) {
       dot.className = 'dot err';
@@ -420,39 +421,83 @@
     } catch (e) { log(`Nepravilnost FAIL: ${e.message}`, 'err'); }
   }
 
-  async function createNalog() {
-    if (!state.vozilo) { log('Najprije se prijavi', 'err'); return; }
+  // ───── templates (testni nalozi iz RN-Baza_test) ─────
+  async function loadTemplates() {
+    try {
+      const list = await api('/v1/radni-nalozi');
+      // Filtriraj samo one koji izgledaju kao parsirani iz PDF-a (numerički brojRN i OIB partnera)
+      state.templates = list.filter(n => /^\d{7,}$/.test(n.brojRN) && n.partner?.oib);
+      renderTemplates();
+      log(`Učitano ${state.templates.length} testnih predložaka iz RN-Baza_test`, 'ok');
+    } catch (e) { log(`Greška učitavanja predložaka: ${e.message}`, 'err'); }
+  }
+
+  function renderTemplates() {
+    const el = $('templateList');
+    if (!state.templates.length) {
+      el.innerHTML = '<div class="nalog-item muted">Nema predložaka. Pokreni `python parse_rn.py` u vts-api.</div>';
+      return;
+    }
+    el.innerHTML = state.templates.map(n => `
+      <div class="nalog-item ${n.id === state.selectedTemplateId ? 'active' : ''}" onclick="selectTemplate('${n.id}')">
+        <div><b>${n.brojRN}</b> · ${n.voziloId}</div>
+        <div class="meta">${n.partner?.naziv || '—'} · ${n.stavke?.length || 0} stavki</div>
+      </div>
+    `).join('');
+  }
+
+  function selectTemplate(id) {
+    state.selectedTemplateId = id;
+    const t = state.templates.find(x => x.id === id);
+    $('templateSel').innerHTML = t
+      ? `Predložak: <b>${t.brojRN}</b> — ${t.partner.naziv}`
+      : 'Predložak: <i>random iz baze</i>';
+    renderTemplates();
+  }
+
+  function clearTemplateSel() {
+    state.selectedTemplateId = null;
+    $('templateSel').innerHTML = 'Predložak: <i>random iz baze</i>';
+    renderTemplates();
+  }
+
+  function pickTemplate(filterVoziloId) {
+    if (!state.templates.length) return null;
+    if (state.selectedTemplateId) {
+      return state.templates.find(t => t.id === state.selectedTemplateId);
+    }
+    const pool = filterVoziloId
+      ? state.templates.filter(t => t.voziloId === filterVoziloId)
+      : state.templates;
+    const list = pool.length ? pool : state.templates;
+    return list[Math.floor(Math.random() * list.length)];
+  }
+
+  async function createNalogFromTemplate(overrideVozilo) {
+    const vozilo = overrideVozilo || state.vozilo;
+    const vozac = overrideVozilo
+      ? state.vozaci.find(d => d.voziloId === overrideVozilo.id)
+      : state.vozac;
+    if (!vozilo || !vozac) { log('Najprije se prijavi', 'err'); return null; }
+    if (!state.templates.length) await loadTemplates();
+    const tpl = pickTemplate(vozilo.id);
+    if (!tpl) { log('Nema testnih predložaka', 'err'); return null; }
+
     const today = new Date().toISOString().split('T')[0];
     const body = {
+      brojRN: `SIM-${Date.now().toString().slice(-8)}`,
+      interniBroj: tpl.interniBroj,
       datumUsluge: today,
-      voziloId: state.vozilo.id,
-      vozacId: state.vozac.id,
-      partner: {
-        naziv: $('newPartner').value,
-        oib: $('newOib').value,
-        adresa: $('newAdresa').value,
-        mjesto: $('newMjesto').value,
-      },
-      lokacija: {
-        naziv: $('newPartner').value,
-        adresa: $('newAdresa').value,
-        mjesto: $('newMjesto').value,
-        lat: 45.8 + Math.random() * 0.1,
-        lng: 15.9 + Math.random() * 0.2,
-      },
-      stavke: [{
-        rbr: 1,
-        sifraArtikla: 'SIM-001',
-        nazivRobe: 'Simulirani odvoz otpada',
-        tipSpremnika: $('newTip').value,
-        kolicina: parseFloat($('newKolicina').value) || 1,
-        jedMjere: 'kom',
-      }],
-      napomena: 'Generirano iz simulatora',
+      voziloId: vozilo.id,
+      vozacId: vozac.id,
+      partner: tpl.partner,
+      lokacija: tpl.lokacija,
+      stavke: tpl.stavke,
+      napomena: `[SIM] iz predloška ${tpl.brojRN}`,
     };
     try {
       const r = await api('/v1/radni-nalozi', { method: 'POST', body: JSON.stringify(body) });
-      log(`Kreiran nalog ${r.brojRN} (${r.partner.naziv})`, 'ok');
+      log(`Kreiran ${r.brojRN} ← predložak ${tpl.brojRN} (${r.partner.naziv})`, 'ok');
       await loadNalozi();
       return r;
     } catch (e) { log(`Kreiranje FAIL: ${e.message}`, 'err'); return null; }
@@ -461,14 +506,20 @@
   // ───── auto simulacija ─────
   async function autoTick() {
     state.auto.count++;
-    log(`▶ Auto tick #${state.auto.count}`, 'info');
-    const created = await createNalog();
+    // Opcionalno rotiranje vozila kroz svu flotu
+    let useVozilo = state.vozilo;
+    if ($('autoRotateVozilo').checked && state.vozila.length) {
+      useVozilo = state.vozila[state.auto.voziloIdx % state.vozila.length];
+      state.auto.voziloIdx++;
+    }
+    log(`▶ Auto tick #${state.auto.count} (${useVozilo.registracija})`, 'info');
+
+    const created = await createNalogFromTemplate(useVozilo);
     if (!created) return;
     state.selectedNalogId = created.id;
     await new Promise(r => setTimeout(r, 400));
     await sendDolazak();
     await new Promise(r => setTimeout(r, 400));
-    // 80% potpis, 20% nepravilnost
     if (Math.random() < 0.8) await sendPotpis();
     else await sendNepravilnost();
   }
