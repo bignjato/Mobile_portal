@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VTS Simulator — slanje podataka</title>
+<title>VTS Simulator — kreiranje radnih naloga</title>
 <style>
   :root {
     --red: #EF0C0C;
@@ -13,7 +13,7 @@
     --card: #ffffff;
     --border: #e2e8f0;
     --green: #16a34a;
-    --orange: #f97316;
+    --blue: #2563eb;
   }
   * { box-sizing: border-box; }
   body {
@@ -25,95 +25,117 @@
   header {
     background: var(--dark);
     color: white;
-    padding: 16px 24px;
+    padding: 14px 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
+    flex-wrap: wrap;
   }
-  header h1 { margin: 0; font-size: 18px; }
-  header .api-cfg { display: flex; gap: 8px; align-items: center; font-size: 13px; }
-  header input { padding: 6px 10px; border-radius: 6px; border: 1px solid #444; background: #1a1f25; color: white; font-size: 13px; min-width: 240px; }
+  header h1 { margin: 0; font-size: 17px; }
+  header .api-cfg { display: flex; gap: 8px; align-items: center; font-size: 13px; flex-wrap: wrap; }
+  header input { padding: 6px 10px; border-radius: 6px; border: 1px solid #444; background: #1a1f25; color: white; font-size: 13px; min-width: 200px; }
+  header a { color: #93c5fd; font-size: 12px; text-decoration: none; }
+  header a:hover { text-decoration: underline; }
+
   main {
-    max-width: 1400px;
+    max-width: 1500px;
     margin: 0 auto;
-    padding: 24px;
+    padding: 18px;
     display: grid;
     grid-template-columns: 380px 1fr;
-    gap: 20px;
+    gap: 16px;
   }
   .card {
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 10px;
-    padding: 18px;
-    margin-bottom: 16px;
+    padding: 16px;
+    margin-bottom: 14px;
   }
-  .card h2 { margin: 0 0 14px 0; font-size: 15px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--grey); }
-  .card h3 { margin: 14px 0 8px 0; font-size: 13px; color: var(--dark); }
-  label { display: block; font-size: 12px; color: var(--grey); margin-bottom: 4px; margin-top: 8px; }
+  .card h2 { margin: 0 0 12px 0; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--grey); }
+  .card h3 { margin: 14px 0 8px 0; font-size: 13px; color: var(--dark); font-weight: 700; }
+  label { display: block; font-size: 11px; color: var(--grey); margin-bottom: 3px; margin-top: 8px; text-transform: uppercase; letter-spacing: 0.3px; }
   input[type=text], input[type=number], input[type=date], select, textarea {
     width: 100%;
-    padding: 8px 10px;
+    padding: 7px 10px;
     border: 1px solid var(--border);
     border-radius: 6px;
     font-size: 13px;
     font-family: inherit;
+    background: white;
   }
-  textarea { min-height: 60px; resize: vertical; }
+  textarea { min-height: 50px; resize: vertical; }
   button {
     background: var(--red);
     color: white;
     border: none;
-    padding: 9px 14px;
+    padding: 8px 14px;
     border-radius: 6px;
     cursor: pointer;
     font-weight: 600;
     font-size: 13px;
-    margin-top: 8px;
-    margin-right: 6px;
+    margin-right: 4px;
   }
   button:hover { opacity: 0.9; }
   button.secondary { background: var(--dark); }
   button.ghost { background: transparent; color: var(--dark); border: 1px solid var(--border); }
   button.green { background: var(--green); }
-  button.orange { background: var(--orange); }
+  button.blue { background: var(--blue); }
+  button.danger { background: #dc2626; }
+  button.small { padding: 4px 9px; font-size: 11px; }
   button:disabled { opacity: 0.4; cursor: not-allowed; }
   .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .nalog-list {
+  .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+
+  .tpl-list {
     max-height: 480px;
     overflow-y: auto;
     border: 1px solid var(--border);
     border-radius: 6px;
   }
-  .nalog-item {
+  .tpl-item {
     padding: 10px 12px;
     border-bottom: 1px solid var(--border);
     cursor: pointer;
     font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
   }
-  .nalog-item:hover { background: var(--bg); }
-  .nalog-item.active { background: #fee2e2; border-left: 3px solid var(--red); }
-  .badge {
+  .tpl-item:hover { background: var(--bg); }
+  .tpl-item.active { background: #fee2e2; border-left: 3px solid var(--red); }
+  .tpl-item .info { flex: 1; min-width: 0; }
+  .tpl-item .info b { display: block; font-size: 13px; }
+  .tpl-item .info .meta { font-size: 11px; color: var(--grey); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tpl-actions { display: flex; gap: 4px; flex-shrink: 0; }
+  .tag {
     display: inline-block;
-    padding: 2px 8px;
+    padding: 1px 7px;
     border-radius: 10px;
-    font-size: 11px;
-    font-weight: 600;
-    margin-left: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    margin-left: 4px;
   }
-  .badge.PLANIRAN { background: #e2e8f0; color: var(--dark); }
-  .badge.NA_LOKACIJI { background: #fef3c7; color: #92400e; }
-  .badge.POTPISAN { background: #dcfce7; color: #166534; }
-  .badge.NEPRAVILNOST { background: #fee2e2; color: var(--red); }
+  .tag.orig { background: #dbeafe; color: #1e40af; }
+  .tag.copy { background: #fef3c7; color: #92400e; }
+  .tag.edit { background: #fde68a; color: #78350f; }
+
+  .stavke-table { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 12px; }
+  .stavke-table th, .stavke-table td { border: 1px solid var(--border); padding: 4px; }
+  .stavke-table th { background: var(--bg); font-size: 11px; text-align: left; }
+  .stavke-table input { padding: 4px 6px; font-size: 12px; border: 1px solid transparent; }
+  .stavke-table input:focus { border-color: var(--border); outline: none; }
+
   .log {
     background: #0f1419;
     color: #d4d4d4;
     border-radius: 6px;
-    padding: 14px;
+    padding: 12px;
     font-family: "SF Mono", Menlo, monospace;
     font-size: 12px;
-    height: 280px;
+    height: 200px;
     overflow-y: auto;
     white-space: pre-wrap;
     word-break: break-word;
@@ -122,152 +144,138 @@
   .log .err { color: #f87171; }
   .log .info { color: #60a5fa; }
   .log .muted { color: #6b7280; }
-  .status {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    color: var(--grey);
-  }
+  .status { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #ddd; }
   .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--grey); }
   .dot.ok { background: var(--green); }
   .dot.err { background: var(--red); }
-  .meta { font-size: 11px; color: var(--grey); margin-top: 2px; }
-  .panel-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
-  .auto-controls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-  .small { font-size: 12px; color: var(--grey); }
+  .empty { padding: 14px; color: var(--grey); text-align: center; font-size: 13px; }
+  .small { font-size: 11px; color: var(--grey); }
+  .toolbar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>🧪 VTS Simulator — slanje podataka u Mobilni portal</h1>
+  <h1>🧪 VTS Simulator — kreiranje radnih naloga</h1>
   <div class="api-cfg">
     <span class="status"><span id="apiDot" class="dot"></span><span id="apiStatus">provjera…</span></span>
-    <label for="apiBase" style="color:#aaa; margin:0;">API:</label>
+    <label for="apiBase" style="color:#aaa; margin:0; text-transform: none; letter-spacing: 0;">API:</label>
     <input id="apiBase" value="http://localhost:4000" />
-    <button class="ghost" onclick="pingApi()">Test</button>
+    <button class="ghost" onclick="pingApi()" style="background:#fff;">Test</button>
+    <a href="http://localhost:5173" target="_blank">↗ Otvori admin portal</a>
   </div>
 </header>
 
 <main>
-  <!-- LIJEVA KOLONA: prijava + radni nalozi -->
+  <!-- LIJEVA KOLONA -->
   <div>
     <div class="card">
-      <h2>1. Prijava vozila</h2>
-      <label>Registracija</label>
-      <select id="registracija"></select>
-      <button onclick="login()">Prijavi se</button>
-      <div id="authInfo" class="meta"></div>
-    </div>
-
-    <div class="card">
-      <h2>2. Radni nalozi (za odabrano vozilo)</h2>
-      <div class="row">
-        <div>
-          <label>Datum</label>
-          <input type="date" id="datumFilter" />
-        </div>
-        <div>
-          <label>&nbsp;</label>
-          <button class="ghost" onclick="loadNalozi()" style="width:100%;">Učitaj</button>
-        </div>
+      <h2>📚 Predlošci (RN-Baza_test)</h2>
+      <div class="toolbar">
+        <button class="ghost" onclick="loadTemplates()">↻ Učitaj</button>
+        <button class="blue" onclick="sendAll()" id="sendAllBtn">⏩ Pošalji sve u portal</button>
       </div>
-      <div id="nalogList" class="nalog-list" style="margin-top:10px;">
-        <div class="nalog-item muted">Najprije se prijavi…</div>
+      <div class="small">Učitano: <b id="tplCount">0</b> predložaka · poslano: <b id="sentCount">0</b></div>
+      <div id="tplList" class="tpl-list" style="margin-top:8px;">
+        <div class="empty">Klikni "Učitaj"…</div>
       </div>
-    </div>
-
-    <div class="card">
-      <h2>📚 Testni predlošci (RN-Baza_test)</h2>
-      <div class="small">Stvarni radni nalozi parsirani iz PDF-ova — koriste se za simulaciju.</div>
-      <div class="row" style="margin-top:8px;">
-        <button class="ghost" onclick="loadTemplates()">↻ Učitaj predloške</button>
-        <button class="ghost" onclick="clearTemplateSel()">✕ Poništi</button>
-      </div>
-      <div id="templateList" class="nalog-list" style="margin-top:10px; max-height:200px;">
-        <div class="nalog-item muted">Klikni "Učitaj predloške"…</div>
-      </div>
-      <div id="templateSel" class="meta" style="margin-top:8px;">Predložak: <i>random iz baze</i></div>
-    </div>
-
-    <div class="card">
-      <h2>⚙ Auto simulacija</h2>
-      <div class="small">Šalje cijeli životni ciklus (kreiranje → dolazak → potpis/nepravilnost) koristeći testne predloške iz RN-Baza_test.</div>
-      <div class="auto-controls" style="margin-top:10px;">
-        <label style="margin:0;">Interval (s)</label>
-        <input type="number" id="autoInterval" value="5" min="1" style="width:80px;" />
-        <label style="margin:0;"><input type="checkbox" id="autoRotateVozilo" checked /> rotiraj vozilo</label>
-        <button id="autoBtn" class="green" onclick="toggleAuto()">▶ Start</button>
-      </div>
-      <div id="autoStatus" class="meta"></div>
-    </div>
-  </div>
-
-  <!-- DESNA KOLONA: akcije + log -->
-  <div>
-    <div class="card">
-      <h2>3. Akcije na odabranom nalogu</h2>
-      <div id="selectedNalog" class="meta" style="margin-bottom:10px;">— nijedan nalog nije odabran —</div>
-
-      <h3>📍 Dolazak na lokaciju</h3>
-      <div class="row">
-        <div><label>GPS lat</label><input id="gpsLat" type="text" value="45.8150" /></div>
-        <div><label>GPS lng</label><input id="gpsLng" type="text" value="15.9819" /></div>
-      </div>
-      <button class="orange" onclick="sendDolazak()">Pošalji dolazak</button>
-
-      <h3>✍ Potpis radnog naloga</h3>
-      <label>Ime potpisnika (partner)</label>
-      <input id="potpisnik" type="text" value="Ivan Horvat" />
-      <button class="green" onclick="sendPotpis()">Pošalji potpis</button>
-
-      <h3>⚠ Nepravilnost</h3>
-      <label>Tip nepravilnosti</label>
-      <select id="nepravilnostTip">
-        <option>Spremnik nije iznesen</option>
-        <option>Pogrešna lokacija</option>
-        <option>Oštećen spremnik</option>
-        <option>Pristup blokiran</option>
-        <option>Drugo</option>
-      </select>
-      <label>Napomena</label>
-      <textarea id="nepravilnostOpis">Spremnik nije bio na lokaciji u dogovoreno vrijeme.</textarea>
-      <button onclick="sendNepravilnost()">Pošalji nepravilnost</button>
-
-      <h3>➕ Kreiraj novi RN iz testnog predloška</h3>
-      <div class="small">Kopira odabrani predložak (ili random iz RN-Baza_test) — novi ID, današnji datum, originalni partner/lokacija/stavke.</div>
-      <button class="secondary" onclick="createNalogFromTemplate()" style="margin-top:8px;">Kreiraj iz predloška</button>
     </div>
 
     <div class="card">
       <h2>📜 Log slanja</h2>
-      <div class="panel-actions">
-        <button class="ghost" onclick="clearLog()">Očisti log</button>
+      <div class="toolbar">
+        <button class="ghost small" onclick="clearLog()">Očisti</button>
       </div>
-      <div id="log" class="log" style="margin-top:10px;"></div>
+      <div id="log" class="log"></div>
+    </div>
+  </div>
+
+  <!-- DESNA KOLONA: editor -->
+  <div>
+    <div class="card">
+      <h2>✏️ Uređivanje radnog naloga</h2>
+      <div id="editorEmpty" class="empty">— odaberi predložak iz liste —</div>
+      <div id="editor" style="display:none;">
+
+        <div class="toolbar">
+          <button class="green" onclick="sendCurrent()">📤 Pošalji u portal</button>
+          <button class="ghost" onclick="copyCurrent()">📋 Kopiraj kao novi</button>
+          <button class="ghost" onclick="resetCurrent()">↺ Reset na original</button>
+          <button class="danger small" onclick="deleteCurrent()" id="deleteBtn" style="margin-left:auto;">🗑 Ukloni kopiju</button>
+        </div>
+
+        <h3>Osnovni podaci</h3>
+        <div class="row3">
+          <div><label>Broj RN</label><input type="text" data-bind="brojRN" /></div>
+          <div><label>Interni broj</label><input type="text" data-bind="interniBroj" /></div>
+          <div><label>Datum usluge</label><input type="date" data-bind="datumUsluge" /></div>
+        </div>
+        <div class="row">
+          <div><label>Vozilo</label><select data-bind="voziloId" id="selVozilo"></select></div>
+          <div><label>Vozač</label><select data-bind="vozacId" id="selVozac"></select></div>
+        </div>
+        <label>Napomena</label>
+        <textarea data-bind="napomena"></textarea>
+
+        <h3>Partner</h3>
+        <div class="row">
+          <div><label>Naziv</label><input type="text" data-bind="partner.naziv" /></div>
+          <div><label>OIB</label><input type="text" data-bind="partner.oib" /></div>
+        </div>
+        <div class="row">
+          <div><label>Adresa</label><input type="text" data-bind="partner.adresa" /></div>
+          <div><label>Mjesto</label><input type="text" data-bind="partner.mjesto" /></div>
+        </div>
+
+        <h3>Lokacija usluge</h3>
+        <div class="row">
+          <div><label>Naziv</label><input type="text" data-bind="lokacija.naziv" /></div>
+          <div><label>Mjesto</label><input type="text" data-bind="lokacija.mjesto" /></div>
+        </div>
+        <div class="row3">
+          <div><label>Adresa</label><input type="text" data-bind="lokacija.adresa" /></div>
+          <div><label>GPS lat</label><input type="text" data-bind="lokacija.lat" /></div>
+          <div><label>GPS lng</label><input type="text" data-bind="lokacija.lng" /></div>
+        </div>
+
+        <h3>Stavke
+          <button class="ghost small" onclick="addStavka()" style="float:right;">+ Dodaj stavku</button>
+        </h3>
+        <table class="stavke-table">
+          <thead>
+            <tr>
+              <th style="width:32px;">#</th>
+              <th style="width:90px;">Šifra</th>
+              <th>Naziv robe</th>
+              <th style="width:140px;">Tip spremnika</th>
+              <th style="width:70px;">Količina</th>
+              <th style="width:60px;">JM</th>
+              <th style="width:30px;"></th>
+            </tr>
+          </thead>
+          <tbody id="stavkeBody"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 </main>
 
 <script>
+  // ───── state ─────
   let state = {
-    token: null,
-    vozac: null,
-    vozilo: null,
     vozila: [],
     vozaci: [],
-    nalozi: [],
-    selectedNalogId: null,
-    templates: [],
-    selectedTemplateId: null,
-    auto: { running: false, timer: null, count: 0, voziloIdx: 0 },
+    templates: [],   // izvorni iz API-ja
+    items: [],       // { uid, source: 'orig'|'copy', dirty, original, current }
+    selectedUid: null,
+    sentCount: 0,
   };
 
-  // ───── helpers ─────
   const $ = (id) => document.getElementById(id);
   const apiBase = () => $('apiBase').value.replace(/\/$/, '');
+  let uidSeq = 1;
 
+  // ───── log ─────
   function log(msg, type = 'info') {
     const el = $('log');
     const time = new Date().toLocaleTimeString('hr-HR');
@@ -279,30 +287,28 @@
   }
   function clearLog() { $('log').innerHTML = ''; }
 
+  // ───── api ─────
   async function api(path, opts = {}) {
-    const url = `${apiBase()}${path}`;
-    const res = await fetch(url, {
+    const res = await fetch(`${apiBase()}${path}`, {
       ...opts,
       headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) },
     });
     const text = await res.text();
-    let data;
-    try { data = JSON.parse(text); } catch { data = text; }
+    let data; try { data = JSON.parse(text); } catch { data = text; }
     if (!res.ok) throw new Error(typeof data === 'string' ? data : (data.message || `HTTP ${res.status}`));
     return data;
   }
 
-  // ───── API status ─────
   async function pingApi() {
     const dot = $('apiDot'), st = $('apiStatus');
     try {
       const [vozila, vozaci] = await Promise.all([api('/v1/vozila'), api('/v1/vozaci')]);
-      dot.className = 'dot ok';
-      st.textContent = `online (${vozila.length} vozila)`;
       state.vozila = vozila;
       state.vozaci = vozaci;
-      renderVozila();
-      loadTemplates();
+      dot.className = 'dot ok';
+      st.textContent = `online (${vozila.length} vozila, ${vozaci.length} vozača)`;
+      populateSelects();
+      await loadTemplates();
       return true;
     } catch (e) {
       dot.className = 'dot err';
@@ -311,244 +317,239 @@
     }
   }
 
-  function renderVozila() {
-    const sel = $('registracija');
-    sel.innerHTML = state.vozila.map(v => `<option value="${v.registracija}">${v.registracija} — ${v.naziv}</option>`).join('');
+  function populateSelects() {
+    $('selVozilo').innerHTML = '<option value="">—</option>' +
+      state.vozila.map(v => `<option value="${v.id}">${v.registracija} — ${v.naziv}</option>`).join('');
+    $('selVozac').innerHTML = '<option value="">—</option>' +
+      state.vozaci.map(d => `<option value="${d.id}">${(d.ime+' '+d.prezime).trim()}</option>`).join('');
   }
 
-  // ───── login ─────
-  async function login() {
-    const registracija = $('registracija').value;
-    try {
-      const r = await api('/v1/auth/login', { method: 'POST', body: JSON.stringify({ registracija }) });
-      state.token = r.token;
-      state.vozac = r.vozac;
-      state.vozilo = r.vozilo;
-      $('authInfo').innerHTML = `✅ <b>${r.vozac.punoIme}</b> — ${r.vozilo.registracija} (${r.brojNaloga} naloga danas)`;
-      log(`Prijava OK: ${r.vozac.punoIme} / ${r.vozilo.registracija}`, 'ok');
-      loadNalozi();
-    } catch (e) {
-      $('authInfo').innerHTML = `❌ ${e.message}`;
-      log(`Prijava neuspjela: ${e.message}`, 'err');
-    }
-  }
-
-  // ───── nalozi ─────
-  async function loadNalozi() {
-    if (!state.vozilo) { log('Najprije se prijavi', 'err'); return; }
-    const datum = $('datumFilter').value;
-    let path = `/v1/radni-nalozi?voziloId=${state.vozilo.id}`;
-    if (datum) path += `&datum=${datum}`;
-    try {
-      const list = await api(path);
-      state.nalozi = list;
-      renderNalozi();
-      log(`Učitano ${list.length} naloga`, 'info');
-    } catch (e) {
-      log(`Greška učitavanja: ${e.message}`, 'err');
-    }
-  }
-
-  function renderNalozi() {
-    const el = $('nalogList');
-    if (!state.nalozi.length) {
-      el.innerHTML = '<div class="nalog-item muted">Nema naloga za odabrane filtere.</div>';
-      return;
-    }
-    el.innerHTML = state.nalozi.map(n => `
-      <div class="nalog-item ${n.id === state.selectedNalogId ? 'active' : ''}" onclick="selectNalog('${n.id}')">
-        <div><b>${n.brojRN || n.id}</b> <span class="badge ${n.status}">${n.status}</span></div>
-        <div class="meta">${n.partner?.naziv || '—'} · ${n.lokacija?.mjesto || ''} · ${n.datumUsluge}</div>
-      </div>
-    `).join('');
-  }
-
-  function selectNalog(id) {
-    state.selectedNalogId = id;
-    const n = state.nalozi.find(x => x.id === id);
-    $('selectedNalog').innerHTML = n
-      ? `📋 <b>${n.brojRN}</b> — ${n.partner?.naziv} <span class="badge ${n.status}">${n.status}</span>`
-      : '— nije odabran —';
-    renderNalozi();
-  }
-
-  function requireNalog() {
-    if (!state.selectedNalogId) { log('Odaberi radni nalog iz liste', 'err'); return null; }
-    return state.selectedNalogId;
-  }
-
-  // ───── akcije ─────
-  async function sendDolazak() {
-    const id = requireNalog(); if (!id) return;
-    const body = {
-      vrijemeDolaska: new Date().toISOString(),
-      gps: { lat: parseFloat($('gpsLat').value), lng: parseFloat($('gpsLng').value) },
-    };
-    try {
-      const r = await api(`/v1/radni-nalozi/${id}/dolazak`, { method: 'PATCH', body: JSON.stringify(body) });
-      log(`Dolazak OK — ${r.brojRN} → ${r.status}`, 'ok');
-      await loadNalozi();
-    } catch (e) { log(`Dolazak FAIL: ${e.message}`, 'err'); }
-  }
-
-  async function sendPotpis() {
-    const id = requireNalog(); if (!id) return;
-    const n = state.nalozi.find(x => x.id === id);
-    const body = {
-      potpis: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
-      potpisPartner: $('potpisnik').value,
-      stavke: n?.stavke || [],
-      timestamp: new Date().toISOString(),
-    };
-    try {
-      const r = await api(`/v1/radni-nalozi/${id}/potpis`, { method: 'POST', body: JSON.stringify(body) });
-      log(`Potpis OK — ${r.brojRN} → ${r.status} (potpisao: ${body.potpisPartner})`, 'ok');
-      await loadNalozi();
-    } catch (e) { log(`Potpis FAIL: ${e.message}`, 'err'); }
-  }
-
-  async function sendNepravilnost() {
-    const id = requireNalog(); if (!id) return;
-    const body = {
-      tip: $('nepravilnostTip').value,
-      opis: $('nepravilnostOpis').value,
-      vrijeme: new Date().toISOString(),
-    };
-    try {
-      const r = await api(`/v1/radni-nalozi/${id}/nepravilnosti`, { method: 'POST', body: JSON.stringify(body) });
-      log(`Nepravilnost OK — ${r.brojRN} → ${r.status} (${body.tip})`, 'ok');
-      await loadNalozi();
-    } catch (e) { log(`Nepravilnost FAIL: ${e.message}`, 'err'); }
-  }
-
-  // ───── templates (testni nalozi iz RN-Baza_test) ─────
+  // ───── templates ─────
   async function loadTemplates() {
     try {
-      const list = await api('/v1/radni-nalozi');
-      // Filtriraj samo one koji izgledaju kao parsirani iz PDF-a (numerički brojRN i OIB partnera)
-      state.templates = list.filter(n => /^\d{7,}$/.test(n.brojRN) && n.partner?.oib);
-      renderTemplates();
-      log(`Učitano ${state.templates.length} testnih predložaka iz RN-Baza_test`, 'ok');
-    } catch (e) { log(`Greška učitavanja predložaka: ${e.message}`, 'err'); }
+      const all = await api('/v1/radni-nalozi');
+      state.templates = all.filter(n => /^\d{7,}$/.test(n.brojRN) && n.partner?.oib);
+      // Ako prazno, fallback: uzmi sve sa OIB-om
+      if (!state.templates.length) state.templates = all.filter(n => n.partner?.oib);
+
+      state.items = state.templates.map(t => ({
+        uid: `o${uidSeq++}`,
+        source: 'orig',
+        dirty: false,
+        original: deepClone(t),
+        current: deepClone(t),
+      }));
+      $('tplCount').textContent = state.templates.length;
+      renderList();
+      log(`Učitano ${state.templates.length} predložaka iz RN-Baza_test`, 'ok');
+    } catch (e) {
+      log(`Greška učitavanja predložaka: ${e.message}`, 'err');
+    }
   }
 
-  function renderTemplates() {
-    const el = $('templateList');
-    if (!state.templates.length) {
-      el.innerHTML = '<div class="nalog-item muted">Nema predložaka. Pokreni `python parse_rn.py` u vts-api.</div>';
+  function deepClone(o) { return JSON.parse(JSON.stringify(o)); }
+
+  function renderList() {
+    const el = $('tplList');
+    if (!state.items.length) {
+      el.innerHTML = '<div class="empty">Nema predložaka. Pokreni `python parse_rn.py` u vts-api.</div>';
       return;
     }
-    el.innerHTML = state.templates.map(n => `
-      <div class="nalog-item ${n.id === state.selectedTemplateId ? 'active' : ''}" onclick="selectTemplate('${n.id}')">
-        <div><b>${n.brojRN}</b> · ${n.voziloId}</div>
-        <div class="meta">${n.partner?.naziv || '—'} · ${n.stavke?.length || 0} stavki</div>
-      </div>
+    el.innerHTML = state.items.map(it => {
+      const tag = it.source === 'orig'
+        ? (it.dirty ? '<span class="tag edit">izmijenjeno</span>' : '<span class="tag orig">original</span>')
+        : '<span class="tag copy">kopija</span>';
+      return `
+        <div class="tpl-item ${it.uid === state.selectedUid ? 'active' : ''}" onclick="selectItem('${it.uid}')">
+          <div class="info">
+            <b>${it.current.brojRN}${tag}</b>
+            <div class="meta">${it.current.partner?.naziv || '—'} · ${it.current.voziloId || '?'} · ${it.current.stavke?.length || 0} stavki</div>
+          </div>
+          <div class="tpl-actions">
+            <button class="ghost small" onclick="event.stopPropagation(); copyItem('${it.uid}')">📋</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function selectItem(uid) {
+    state.selectedUid = uid;
+    renderList();
+    renderEditor();
+  }
+
+  function findItem(uid) { return state.items.find(x => x.uid === uid); }
+  function currentItem() { return findItem(state.selectedUid); }
+
+  // ───── editor ─────
+  function renderEditor() {
+    const it = currentItem();
+    if (!it) {
+      $('editor').style.display = 'none';
+      $('editorEmpty').style.display = 'block';
+      return;
+    }
+    $('editor').style.display = 'block';
+    $('editorEmpty').style.display = 'none';
+
+    // bind sva polja s data-bind
+    document.querySelectorAll('#editor [data-bind]').forEach(el => {
+      const path = el.dataset.bind.split('.');
+      let v = it.current;
+      for (const p of path) v = v ? v[p] : '';
+      el.value = v ?? '';
+      el.oninput = () => {
+        let obj = it.current;
+        for (let i = 0; i < path.length - 1; i++) {
+          if (!obj[path[i]]) obj[path[i]] = {};
+          obj = obj[path[i]];
+        }
+        obj[path[path.length - 1]] = el.value;
+        if (it.source === 'orig') it.dirty = JSON.stringify(it.current) !== JSON.stringify(it.original);
+        renderList();
+      };
+    });
+
+    // stavke
+    renderStavke(it);
+
+    // delete button samo za kopije
+    $('deleteBtn').style.display = it.source === 'copy' ? 'inline-block' : 'none';
+  }
+
+  function renderStavke(it) {
+    const body = $('stavkeBody');
+    body.innerHTML = (it.current.stavke || []).map((s, i) => `
+      <tr>
+        <td>${i + 1}</td>
+        <td><input type="text" value="${esc(s.sifraArtikla || '')}" oninput="updStavka(${i}, 'sifraArtikla', this.value)" /></td>
+        <td><input type="text" value="${esc(s.nazivRobe || '')}" oninput="updStavka(${i}, 'nazivRobe', this.value)" /></td>
+        <td><input type="text" value="${esc(s.tipSpremnika || '')}" oninput="updStavka(${i}, 'tipSpremnika', this.value)" /></td>
+        <td><input type="number" step="0.01" value="${s.kolicina ?? 0}" oninput="updStavka(${i}, 'kolicina', parseFloat(this.value) || 0)" /></td>
+        <td><input type="text" value="${esc(s.jedMjere || '')}" oninput="updStavka(${i}, 'jedMjere', this.value)" /></td>
+        <td><button class="ghost small" onclick="removeStavka(${i})">✕</button></td>
+      </tr>
     `).join('');
   }
 
-  function selectTemplate(id) {
-    state.selectedTemplateId = id;
-    const t = state.templates.find(x => x.id === id);
-    $('templateSel').innerHTML = t
-      ? `Predložak: <b>${t.brojRN}</b> — ${t.partner.naziv}`
-      : 'Predložak: <i>random iz baze</i>';
-    renderTemplates();
+  function esc(s) { return String(s).replace(/"/g, '&quot;'); }
+
+  function updStavka(i, key, val) {
+    const it = currentItem(); if (!it) return;
+    it.current.stavke[i][key] = val;
+    if (it.source === 'orig') it.dirty = JSON.stringify(it.current) !== JSON.stringify(it.original);
+    renderList();
   }
 
-  function clearTemplateSel() {
-    state.selectedTemplateId = null;
-    $('templateSel').innerHTML = 'Predložak: <i>random iz baze</i>';
-    renderTemplates();
+  function addStavka() {
+    const it = currentItem(); if (!it) return;
+    it.current.stavke = it.current.stavke || [];
+    const nextRbr = it.current.stavke.length + 1;
+    it.current.stavke.push({ rbr: nextRbr, sifraArtikla: '', nazivRobe: '', tipSpremnika: '', kolicina: 0, jedMjere: 'kom' });
+    renderStavke(it);
+    if (it.source === 'orig') { it.dirty = true; renderList(); }
   }
 
-  function pickTemplate(filterVoziloId) {
-    if (!state.templates.length) return null;
-    if (state.selectedTemplateId) {
-      return state.templates.find(t => t.id === state.selectedTemplateId);
-    }
-    const pool = filterVoziloId
-      ? state.templates.filter(t => t.voziloId === filterVoziloId)
-      : state.templates;
-    const list = pool.length ? pool : state.templates;
-    return list[Math.floor(Math.random() * list.length)];
+  function removeStavka(i) {
+    const it = currentItem(); if (!it) return;
+    it.current.stavke.splice(i, 1);
+    it.current.stavke.forEach((s, idx) => s.rbr = idx + 1);
+    renderStavke(it);
+    if (it.source === 'orig') { it.dirty = JSON.stringify(it.current) !== JSON.stringify(it.original); renderList(); }
   }
 
-  async function createNalogFromTemplate(overrideVozilo) {
-    const vozilo = overrideVozilo || state.vozilo;
-    const vozac = overrideVozilo
-      ? state.vozaci.find(d => d.voziloId === overrideVozilo.id)
-      : state.vozac;
-    if (!vozilo || !vozac) { log('Najprije se prijavi', 'err'); return null; }
-    if (!state.templates.length) await loadTemplates();
-    const tpl = pickTemplate(vozilo.id);
-    if (!tpl) { log('Nema testnih predložaka', 'err'); return null; }
+  function resetCurrent() {
+    const it = currentItem(); if (!it) return;
+    if (it.source === 'copy') { log('Reset radi samo na originalima', 'err'); return; }
+    it.current = deepClone(it.original);
+    it.dirty = false;
+    renderEditor();
+    renderList();
+    log(`Reset ${it.current.brojRN}`, 'info');
+  }
 
-    const today = new Date().toISOString().split('T')[0];
-    const body = {
-      brojRN: `SIM-${Date.now().toString().slice(-8)}`,
-      interniBroj: tpl.interniBroj,
-      datumUsluge: today,
-      voziloId: vozilo.id,
-      vozacId: vozac.id,
-      partner: tpl.partner,
-      lokacija: tpl.lokacija,
-      stavke: tpl.stavke,
-      napomena: `[SIM] iz predloška ${tpl.brojRN}`,
+  function copyItem(uid) {
+    const src = findItem(uid); if (!src) return;
+    const copy = deepClone(src.current);
+    copy.brojRN = `${copy.brojRN}-K${Date.now().toString().slice(-4)}`;
+    const it = {
+      uid: `c${uidSeq++}`,
+      source: 'copy',
+      dirty: false,
+      original: deepClone(copy),
+      current: copy,
     };
+    state.items.push(it);
+    state.selectedUid = it.uid;
+    renderList();
+    renderEditor();
+    log(`Kopija stvorena: ${copy.brojRN}`, 'info');
+  }
+  function copyCurrent() { const it = currentItem(); if (it) copyItem(it.uid); }
+
+  function deleteCurrent() {
+    const it = currentItem(); if (!it) return;
+    if (it.source !== 'copy') { log('Brisanje radi samo na kopijama', 'err'); return; }
+    state.items = state.items.filter(x => x.uid !== it.uid);
+    state.selectedUid = null;
+    renderList();
+    renderEditor();
+    log(`Uklonjena kopija ${it.current.brojRN}`, 'info');
+  }
+
+  // ───── slanje ─────
+  function buildPayload(rn) {
+    return {
+      brojRN: rn.brojRN,
+      interniBroj: rn.interniBroj || '',
+      datumUsluge: rn.datumUsluge,
+      voziloId: rn.voziloId,
+      vozacId: rn.vozacId,
+      partner: rn.partner,
+      lokacija: {
+        ...rn.lokacija,
+        lat: rn.lokacija?.lat ? parseFloat(rn.lokacija.lat) : undefined,
+        lng: rn.lokacija?.lng ? parseFloat(rn.lokacija.lng) : undefined,
+      },
+      stavke: rn.stavke || [],
+      napomena: rn.napomena || '',
+      // status namjerno NE šaljemo — API postavlja PLANIRAN
+    };
+  }
+
+  async function sendCurrent() {
+    const it = currentItem(); if (!it) return;
     try {
-      const r = await api('/v1/radni-nalozi', { method: 'POST', body: JSON.stringify(body) });
-      log(`Kreiran ${r.brojRN} ← predložak ${tpl.brojRN} (${r.partner.naziv})`, 'ok');
-      await loadNalozi();
-      return r;
-    } catch (e) { log(`Kreiranje FAIL: ${e.message}`, 'err'); return null; }
+      const r = await api('/v1/radni-nalozi', { method: 'POST', body: JSON.stringify(buildPayload(it.current)) });
+      state.sentCount++;
+      $('sentCount').textContent = state.sentCount;
+      log(`✅ Poslan u portal: ${r.brojRN} → id ${r.id} (${r.partner?.naziv || ''})`, 'ok');
+    } catch (e) {
+      log(`❌ Slanje FAIL: ${e.message}`, 'err');
+    }
   }
 
-  // ───── auto simulacija ─────
-  async function autoTick() {
-    state.auto.count++;
-    // Opcionalno rotiranje vozila kroz svu flotu
-    let useVozilo = state.vozilo;
-    if ($('autoRotateVozilo').checked && state.vozila.length) {
-      useVozilo = state.vozila[state.auto.voziloIdx % state.vozila.length];
-      state.auto.voziloIdx++;
+  async function sendAll() {
+    const btn = $('sendAllBtn');
+    btn.disabled = true;
+    const before = state.sentCount;
+    log(`▶ Slanje ${state.items.length} naloga u portal…`, 'info');
+    for (const it of state.items) {
+      try {
+        const r = await api('/v1/radni-nalozi', { method: 'POST', body: JSON.stringify(buildPayload(it.current)) });
+        state.sentCount++;
+        $('sentCount').textContent = state.sentCount;
+        log(`  ✅ ${r.brojRN} (${r.partner?.naziv?.slice(0,40) || ''})`, 'ok');
+      } catch (e) {
+        log(`  ❌ ${it.current.brojRN}: ${e.message}`, 'err');
+      }
     }
-    log(`▶ Auto tick #${state.auto.count} (${useVozilo.registracija})`, 'info');
-
-    const created = await createNalogFromTemplate(useVozilo);
-    if (!created) return;
-    state.selectedNalogId = created.id;
-    await new Promise(r => setTimeout(r, 400));
-    await sendDolazak();
-    await new Promise(r => setTimeout(r, 400));
-    if (Math.random() < 0.8) await sendPotpis();
-    else await sendNepravilnost();
-  }
-
-  function toggleAuto() {
-    const btn = $('autoBtn');
-    if (state.auto.running) {
-      clearInterval(state.auto.timer);
-      state.auto.running = false;
-      btn.textContent = '▶ Start';
-      btn.className = 'green';
-      $('autoStatus').textContent = `Zaustavljeno nakon ${state.auto.count} ciklusa.`;
-      log('⏸ Auto simulacija zaustavljena', 'info');
-    } else {
-      if (!state.vozilo) { log('Najprije se prijavi', 'err'); return; }
-      const interval = Math.max(1, parseInt($('autoInterval').value) || 5) * 1000;
-      state.auto.running = true;
-      state.auto.count = 0;
-      btn.textContent = '⏸ Stop';
-      btn.className = 'orange';
-      $('autoStatus').textContent = `Pokrenuto, interval ${interval/1000}s.`;
-      log(`▶ Auto simulacija pokrenuta (${interval/1000}s)`, 'info');
-      autoTick();
-      state.auto.timer = setInterval(autoTick, interval);
-    }
+    log(`Gotovo. Poslano ${state.sentCount - before} novih naloga.`, 'info');
+    btn.disabled = false;
   }
 
   // ───── init ─────
-  $('datumFilter').value = new Date().toISOString().split('T')[0];
   pingApi();
 </script>
 </body>
