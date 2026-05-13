@@ -1,80 +1,173 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Card, Badge, Avatar, Plate, Table, Tr, Td, Btn, TabBar, FilterChip } from '../components/ui'
+import { api, statusUi, initials, timeFromIso, todayIso, type RadniNalog, type Vozilo, type Vozac } from '../api'
 
-const NALOZI = [
-  { br: 'RN-2025-0342', partner: 'SPAR Hrvatska d.o.o.',  adresa: 'Ozaljska 105, Zagreb',   initials: 'IH', name: 'Ivan Horvat',   idx: 0, reg: 'ZG 1234 AB', status: '⏳ U tijeku',      variant: 'amber' as const, time: '08:30' },
-  { br: 'RN-2025-0341', partner: 'KONZUM d.o.o.',         adresa: 'Ilica 242, Zagreb',       initials: 'IH', name: 'Ivan Horvat',   idx: 0, reg: 'ZG 1234 AB', status: '✅ Potpisan',      variant: 'green' as const, time: '07:45' },
-  { br: 'RN-2025-0340', partner: 'TOMMY d.o.o.',          adresa: 'Bauerova 12, Zagreb',     initials: 'AK', name: 'Ana Knežević',  idx: 2, reg: 'ZG 9012 EF', status: '✅ Potpisan',      variant: 'green' as const, time: '09:20' },
-  { br: 'RN-2025-0339', partner: 'INTERSPAR d.o.o.',      adresa: 'Heinzelova 60, Zagreb',   initials: 'JP', name: 'Josip Perić',   idx: 3, reg: 'ZG 3456 GH', status: '⚠ Nepravilnost',  variant: 'red'   as const, time: '08:55' },
-  { br: 'RN-2025-0338', partner: 'STUDENAC d.o.o.',       adresa: 'Vlaška 78, Zagreb',       initials: 'MB', name: 'Marko Babić',   idx: 1, reg: 'ZG 5678 CD', status: '📅 Planiran',      variant: 'blue'  as const, time: '10:15' },
-  { br: 'RN-2025-0337', partner: 'LIDL Hrvatska d.o.o.',  adresa: 'Žitnjak bb, Zagreb',      initials: 'MB', name: 'Marko Babić',   idx: 1, reg: 'ZG 5678 CD', status: '📅 Planiran',      variant: 'blue'  as const, time: '11:30' },
-]
+const TABS = ['Danas', 'Tjedan', 'Svi nalozi']
+const FILTERS = ['Svi', 'Planirani', 'U tijeku', 'Potpisani', 'Nepravilnost'] as const
+type Filter = typeof FILTERS[number]
 
-const TABS = ['Danas (47)', 'Tjedan (262)', 'Svi nalozi']
-const FILTERS = ['Svi', 'Planirani (16)', 'U tijeku (8)', 'Potpisani (19)', 'Nepravilnost (4)']
+const STATUS_FILTER: Record<Filter, RadniNalog['status'] | null> = {
+  'Svi': null,
+  'Planirani': 'PLANIRAN',
+  'U tijeku': 'NA_LOKACIJI',
+  'Potpisani': 'POTPISAN',
+  'Nepravilnost': 'NEPRAVILNOST',
+}
+
+function inTab(rn: RadniNalog, tab: string): boolean {
+  if (tab === 'Svi nalozi') return true
+  const d = new Date(rn.datumUsluge)
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  if (tab === 'Danas') return rn.datumUsluge === todayIso()
+  if (tab === 'Tjedan') {
+    const diff = (today.getTime() - d.getTime()) / 86400000
+    return diff >= 0 && diff < 7
+  }
+  return true
+}
 
 export default function Nalozi() {
   const [tab, setTab] = useState(TABS[0])
-  const [filter, setFilter] = useState('Svi')
+  const [filter, setFilter] = useState<Filter>('Svi')
+  const [nalozi, setNalozi] = useState<RadniNalog[]>([])
+  const [vozila, setVozila] = useState<Vozilo[]>([])
+  const [vozaci, setVozaci] = useState<Vozac[]>([])
+  const [voziloFilter, setVoziloFilter] = useState<string>('')
+  const [vozacFilter, setVozacFilter] = useState<string>('')
+  const [err, setErr] = useState<string | null>(null)
+  const [lastUpdate, setLastUpdate] = useState<Date | null>(null)
+
+  useEffect(() => {
+    let mounted = true
+    const load = async () => {
+      try {
+        const [n, v, d] = await Promise.all([api.nalozi(), api.vozila(), api.vozaci()])
+        if (!mounted) return
+        setNalozi(n)
+        setVozila(v)
+        setVozaci(d)
+        setLastUpdate(new Date())
+        setErr(null)
+      } catch (e) {
+        if (mounted) setErr((e as Error).message)
+      }
+    }
+    load()
+    const t = setInterval(load, 3000)
+    return () => { mounted = false; clearInterval(t) }
+  }, [])
+
+  const voziloById = useMemo(() => Object.fromEntries(vozila.map(v => [v.id, v])), [vozila])
+  const vozacById = useMemo(() => Object.fromEntries(vozaci.map(v => [v.id, v])), [vozaci])
+
+  const counts = useMemo(() => ({
+    danas: nalozi.filter(n => inTab(n, 'Danas')).length,
+    tjedan: nalozi.filter(n => inTab(n, 'Tjedan')).length,
+    svi: nalozi.length,
+    PLANIRAN: nalozi.filter(n => n.status === 'PLANIRAN').length,
+    NA_LOKACIJI: nalozi.filter(n => n.status === 'NA_LOKACIJI').length,
+    POTPISAN: nalozi.filter(n => n.status === 'POTPISAN').length,
+    NEPRAVILNOST: nalozi.filter(n => n.status === 'NEPRAVILNOST').length,
+  }), [nalozi])
+
+  const filteredTabs = [
+    `Danas (${counts.danas})`,
+    `Tjedan (${counts.tjedan})`,
+    `Svi nalozi (${counts.svi})`,
+  ]
+  const tabKey = filteredTabs.indexOf(tab) >= 0 ? TABS[filteredTabs.indexOf(tab)] : TABS[0]
+
+  const filterCounts: Record<Filter, number> = {
+    'Svi': counts.svi,
+    'Planirani': counts.PLANIRAN,
+    'U tijeku': counts.NA_LOKACIJI,
+    'Potpisani': counts.POTPISAN,
+    'Nepravilnost': counts.NEPRAVILNOST,
+  }
+
+  const view = nalozi
+    .filter(n => inTab(n, tabKey))
+    .filter(n => {
+      const s = STATUS_FILTER[filter]
+      return s ? n.status === s : true
+    })
+    .filter(n => (voziloFilter ? n.voziloId === voziloFilter : true))
+    .filter(n => (vozacFilter ? n.vozacId === vozacFilter : true))
+    .sort((a, b) => (b.datumUsluge + (b.vrijemeDolaska || '')).localeCompare(a.datumUsluge + (a.vrijemeDolaska || '')))
 
   return (
     <>
-      <TabBar tabs={TABS} active={tab} onChange={setTab} />
+      <TabBar tabs={filteredTabs} active={tab} onChange={setTab} />
 
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
         {FILTERS.map(f => (
-          <FilterChip key={f} active={filter === f} onClick={() => setFilter(f)}>{f}</FilterChip>
+          <FilterChip key={f} active={filter === f} onClick={() => setFilter(f)}>
+            {f}{f !== 'Svi' ? ` (${filterCounts[f]})` : ''}
+          </FilterChip>
         ))}
         <div style={{ flex: 1 }} />
-        <select style={{ padding: '5px 10px', borderRadius: 8, border: '1px solid var(--border)', fontSize: 11, color: 'var(--text2)', fontFamily: 'inherit' }}>
-          <option>Svi vozači</option>
+        <select
+          value={vozacFilter}
+          onChange={e => setVozacFilter(e.target.value)}
+          style={{ padding: '5px 10px', borderRadius: 8, border: '1px solid var(--border)', fontSize: 11, color: 'var(--text2)', fontFamily: 'inherit' }}>
+          <option value="">Svi vozači</option>
+          {vozaci.map(d => <option key={d.id} value={d.id}>{d.ime} {d.prezime}</option>)}
         </select>
-        <select style={{ padding: '5px 10px', borderRadius: 8, border: '1px solid var(--border)', fontSize: 11, color: 'var(--text2)', fontFamily: 'inherit' }}>
-          <option>Sva vozila</option>
+        <select
+          value={voziloFilter}
+          onChange={e => setVoziloFilter(e.target.value)}
+          style={{ padding: '5px 10px', borderRadius: 8, border: '1px solid var(--border)', fontSize: 11, color: 'var(--text2)', fontFamily: 'inherit' }}>
+          <option value="">Sva vozila</option>
+          {vozila.map(v => <option key={v.id} value={v.id}>{v.registracija}</option>)}
         </select>
         <Btn variant="outline">📥 Izvoz</Btn>
       </div>
 
+      <div style={{ fontSize: 11, color: 'var(--text2)' }}>
+        {err
+          ? <span style={{ color: 'var(--red)' }}>⚠ API ne odgovara: {err}</span>
+          : <span>🔄 Live (svake 3s) · zadnje: {lastUpdate?.toLocaleTimeString('hr-HR') || '—'} · {view.length} prikazano</span>
+        }
+      </div>
+
       <Card noPad>
         <Table head={['Broj RN', 'Partner', 'Adresa', 'Vozač', 'Vozilo', 'Status', 'Vrijeme', '']}>
-          {NALOZI.map(n => (
-            <Tr key={n.br}>
-              <Td first><strong>{n.br}</strong></Td>
-              <Td>{n.partner}</Td>
-              <Td muted>{n.adresa}</Td>
-              <Td>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <Avatar initials={n.initials} index={n.idx} />
-                  {n.name}
-                </div>
-              </Td>
-              <Td><Plate reg={n.reg} /></Td>
-              <Td><Badge variant={n.variant}>{n.status}</Badge></Td>
-              <Td muted>{n.time}</Td>
-              <Td>
-                <Btn variant={n.variant === 'red' ? 'red' : 'outline'}>
-                  {n.variant === 'red' ? 'Pregled' : 'Otvori'}
-                </Btn>
-              </Td>
-            </Tr>
-          ))}
+          {view.map((n, i) => {
+            const v = voziloById[n.voziloId]
+            const d = vozacById[n.vozacId]
+            const ime = d ? `${d.ime} ${d.prezime}`.trim() : '—'
+            const ui = statusUi(n.status)
+            const vrijeme = timeFromIso(n.vrijemePotpisa || n.vrijemeDolaska) !== '—'
+              ? timeFromIso(n.vrijemePotpisa || n.vrijemeDolaska)
+              : n.datumUsluge
+            return (
+              <Tr key={n.id}>
+                <Td first><strong>{n.brojRN}</strong></Td>
+                <Td>{n.partner?.naziv || '—'}</Td>
+                <Td muted>{[n.lokacija?.adresa, n.lokacija?.mjesto].filter(Boolean).join(', ')}</Td>
+                <Td>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <Avatar initials={initials(d?.ime || '?', d?.prezime)} index={i % 4} />
+                    {ime}
+                  </div>
+                </Td>
+                <Td>{v ? <Plate reg={v.registracija} /> : '—'}</Td>
+                <Td><Badge variant={ui.variant}>{ui.label}</Badge></Td>
+                <Td muted>{vrijeme}</Td>
+                <Td>
+                  <Btn variant={ui.variant === 'red' ? 'red' : 'outline'}>
+                    {ui.variant === 'red' ? 'Pregled' : 'Otvori'}
+                  </Btn>
+                </Td>
+              </Tr>
+            )
+          })}
+          {view.length === 0 && (
+            <Tr><Td first>Nema naloga za odabrane filtere.</Td></Tr>
+          )}
         </Table>
       </Card>
-
-      {/* Pagination */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11, color: 'var(--text2)' }}>
-        <span>Prikazano 1–6 od 47</span>
-        <div style={{ display: 'flex', gap: 4 }}>
-          {['‹', '1', '2', '3', '›'].map((p, i) => (
-            <button key={i} style={{
-              padding: '4px 10px', borderRadius: 8, fontSize: 11, fontWeight: 700,
-              background: p === '1' ? 'var(--dark)' : 'white',
-              color: p === '1' ? 'white' : 'var(--text)',
-              border: '1px solid var(--border)', cursor: 'pointer',
-            }}>{p}</button>
-          ))}
-        </div>
-      </div>
     </>
   )
 }
