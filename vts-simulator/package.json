@@ -1,0 +1,15 @@
+{
+  "name": "vts-simulator",
+  "version": "0.1.0",
+  "description": "Simulator slanja podataka za VTS Mobilni portal (radni nalozi, dolasci, potpisi, nepravilnosti)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "cli": "node cli.js",
+    "auto": "node cli.js auto"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

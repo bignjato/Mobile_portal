@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VTS Simulator — slanje podataka</title>
+<style>
+  :root {
+    --red: #EF0C0C;
+    --dark: #242930;
+    --grey: #7B8287;
+    --bg: #F1F5F9;
+    --card: #ffffff;
+    --border: #e2e8f0;
+    --green: #16a34a;
+    --orange: #f97316;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--dark);
+  }
+  header {
+    background: var(--dark);
+    color: white;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  header h1 { margin: 0; font-size: 18px; }
+  header .api-cfg { display: flex; gap: 8px; align-items: center; font-size: 13px; }
+  header input { padding: 6px 10px; border-radius: 6px; border: 1px solid #444; background: #1a1f25; color: white; font-size: 13px; min-width: 240px; }
+  main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px;
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 20px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+    margin-bottom: 16px;
+  }
+  .card h2 { margin: 0 0 14px 0; font-size: 15px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--grey); }
+  .card h3 { margin: 14px 0 8px 0; font-size: 13px; color: var(--dark); }
+  label { display: block; font-size: 12px; color: var(--grey); margin-bottom: 4px; margin-top: 8px; }
+  input[type=text], input[type=number], input[type=date], select, textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+  }
+  textarea { min-height: 60px; resize: vertical; }
+  button {
+    background: var(--red);
+    color: white;
+    border: none;
+    padding: 9px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    margin-top: 8px;
+    margin-right: 6px;
+  }
+  button:hover { opacity: 0.9; }
+  button.secondary { background: var(--dark); }
+  button.ghost { background: transparent; color: var(--dark); border: 1px solid var(--border); }
+  button.green { background: var(--green); }
+  button.orange { background: var(--orange); }
+  button:disabled { opacity: 0.4; cursor: not-allowed; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .nalog-list {
+    max-height: 480px;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+  .nalog-item {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .nalog-item:hover { background: var(--bg); }
+  .nalog-item.active { background: #fee2e2; border-left: 3px solid var(--red); }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-left: 6px;
+  }
+  .badge.PLANIRAN { background: #e2e8f0; color: var(--dark); }
+  .badge.NA_LOKACIJI { background: #fef3c7; color: #92400e; }
+  .badge.POTPISAN { background: #dcfce7; color: #166534; }
+  .badge.NEPRAVILNOST { background: #fee2e2; color: var(--red); }
+  .log {
+    background: #0f1419;
+    color: #d4d4d4;
+    border-radius: 6px;
+    padding: 14px;
+    font-family: "SF Mono", Menlo, monospace;
+    font-size: 12px;
+    height: 280px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .log .ok { color: #4ade80; }
+  .log .err { color: #f87171; }
+  .log .info { color: #60a5fa; }
+  .log .muted { color: #6b7280; }
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--grey);
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--grey); }
+  .dot.ok { background: var(--green); }
+  .dot.err { background: var(--red); }
+  .meta { font-size: 11px; color: var(--grey); margin-top: 2px; }
+  .panel-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .auto-controls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .small { font-size: 12px; color: var(--grey); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🧪 VTS Simulator — slanje podataka u Mobilni portal</h1>
+  <div class="api-cfg">
+    <span class="status"><span id="apiDot" class="dot"></span><span id="apiStatus">provjera…</span></span>
+    <label for="apiBase" style="color:#aaa; margin:0;">API:</label>
+    <input id="apiBase" value="http://localhost:4000" />
+    <button class="ghost" onclick="pingApi()">Test</button>
+  </div>
+</header>
+
+<main>
+  <!-- LIJEVA KOLONA: prijava + radni nalozi -->
+  <div>
+    <div class="card">
+      <h2>1. Prijava vozila</h2>
+      <label>Registracija</label>
+      <select id="registracija"></select>
+      <button onclick="login()">Prijavi se</button>
+      <div id="authInfo" class="meta"></div>
+    </div>
+
+    <div class="card">
+      <h2>2. Radni nalozi (za odabrano vozilo)</h2>
+      <div class="row">
+        <div>
+          <label>Datum</label>
+          <input type="date" id="datumFilter" />
+        </div>
+        <div>
+          <label>&nbsp;</label>
+          <button class="ghost" onclick="loadNalozi()" style="width:100%;">Učitaj</button>
+        </div>
+      </div>
+      <div id="nalogList" class="nalog-list" style="margin-top:10px;">
+        <div class="nalog-item muted">Najprije se prijavi…</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>⚙ Auto simulacija</h2>
+      <div class="small">Generira radne naloge i šalje cijeli životni ciklus u zadanom intervalu.</div>
+      <div class="auto-controls" style="margin-top:10px;">
+        <label style="margin:0;">Interval (s)</label>
+        <input type="number" id="autoInterval" value="5" min="1" style="width:80px;" />
+        <button id="autoBtn" class="green" onclick="toggleAuto()">▶ Start</button>
+      </div>
+      <div id="autoStatus" class="meta"></div>
+    </div>
+  </div>
+
+  <!-- DESNA KOLONA: akcije + log -->
+  <div>
+    <div class="card">
+      <h2>3. Akcije na odabranom nalogu</h2>
+      <div id="selectedNalog" class="meta" style="margin-bottom:10px;">— nijedan nalog nije odabran —</div>
+
+      <h3>📍 Dolazak na lokaciju</h3>
+      <div class="row">
+        <div><label>GPS lat</label><input id="gpsLat" type="text" value="45.8150" /></div>
+        <div><label>GPS lng</label><input id="gpsLng" type="text" value="15.9819" /></div>
+      </div>
+      <button class="orange" onclick="sendDolazak()">Pošalji dolazak</button>
+
+      <h3>✍ Potpis radnog naloga</h3>
+      <label>Ime potpisnika (partner)</label>
+      <input id="potpisnik" type="text" value="Ivan Horvat" />
+      <button class="green" onclick="sendPotpis()">Pošalji potpis</button>
+
+      <h3>⚠ Nepravilnost</h3>
+      <label>Tip nepravilnosti</label>
+      <select id="nepravilnostTip">
+        <option>Spremnik nije iznesen</option>
+        <option>Pogrešna lokacija</option>
+        <option>Oštećen spremnik</option>
+        <option>Pristup blokiran</option>
+        <option>Drugo</option>
+      </select>
+      <label>Napomena</label>
+      <textarea id="nepravilnostOpis">Spremnik nije bio na lokaciji u dogovoreno vrijeme.</textarea>
+      <button onclick="sendNepravilnost()">Pošalji nepravilnost</button>
+
+      <h3>➕ Kreiraj novi radni nalog</h3>
+      <div class="row">
+        <div><label>Partner</label><input id="newPartner" type="text" value="TEST PARTNER d.o.o." /></div>
+        <div><label>OIB</label><input id="newOib" type="text" value="12345678901" /></div>
+      </div>
+      <div class="row">
+        <div><label>Adresa</label><input id="newAdresa" type="text" value="Ilica 1" /></div>
+        <div><label>Mjesto</label><input id="newMjesto" type="text" value="Zagreb" /></div>
+      </div>
+      <div class="row">
+        <div><label>Tip spremnika</label>
+          <select id="newTip">
+            <option>KANTA_120L</option>
+            <option>KANTA_240L</option>
+            <option>KONTEJNER_1100L</option>
+            <option>PRESS_KONTEJNER</option>
+          </select>
+        </div>
+        <div><label>Količina</label><input id="newKolicina" type="number" value="3" /></div>
+      </div>
+      <button class="secondary" onclick="createNalog()">Kreiraj nalog</button>
+    </div>
+
+    <div class="card">
+      <h2>📜 Log slanja</h2>
+      <div class="panel-actions">
+        <button class="ghost" onclick="clearLog()">Očisti log</button>
+      </div>
+      <div id="log" class="log" style="margin-top:10px;"></div>
+    </div>
+  </div>
+</main>
+
+<script>
+  let state = {
+    token: null,
+    vozac: null,
+    vozilo: null,
+    vozila: [],
+    nalozi: [],
+    selectedNalogId: null,
+    auto: { running: false, timer: null, count: 0 },
+  };
+
+  // ───── helpers ─────
+  const $ = (id) => document.getElementById(id);
+  const apiBase = () => $('apiBase').value.replace(/\/$/, '');
+
+  function log(msg, type = 'info') {
+    const el = $('log');
+    const time = new Date().toLocaleTimeString('hr-HR');
+    const line = document.createElement('div');
+    line.className = type;
+    line.textContent = `[${time}] ${msg}`;
+    el.appendChild(line);
+    el.scrollTop = el.scrollHeight;
+  }
+  function clearLog() { $('log').innerHTML = ''; }
+
+  async function api(path, opts = {}) {
+    const url = `${apiBase()}${path}`;
+    const res = await fetch(url, {
+      ...opts,
+      headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) },
+    });
+    const text = await res.text();
+    let data;
+    try { data = JSON.parse(text); } catch { data = text; }
+    if (!res.ok) throw new Error(typeof data === 'string' ? data : (data.message || `HTTP ${res.status}`));
+    return data;
+  }
+
+  // ───── API status ─────
+  async function pingApi() {
+    const dot = $('apiDot'), st = $('apiStatus');
+    try {
+      const r = await api('/v1/vozila');
+      dot.className = 'dot ok';
+      st.textContent = `online (${r.length} vozila)`;
+      state.vozila = r;
+      renderVozila();
+      return true;
+    } catch (e) {
+      dot.className = 'dot err';
+      st.textContent = 'offline: ' + e.message;
+      return false;
+    }
+  }
+
+  function renderVozila() {
+    const sel = $('registracija');
+    sel.innerHTML = state.vozila.map(v => `<option value="${v.registracija}">${v.registracija} — ${v.naziv}</option>`).join('');
+  }
+
+  // ───── login ─────
+  async function login() {
+    const registracija = $('registracija').value;
+    try {
+      const r = await api('/v1/auth/login', { method: 'POST', body: JSON.stringify({ registracija }) });
+      state.token = r.token;
+      state.vozac = r.vozac;
+      state.vozilo = r.vozilo;
+      $('authInfo').innerHTML = `✅ <b>${r.vozac.punoIme}</b> — ${r.vozilo.registracija} (${r.brojNaloga} naloga danas)`;
+      log(`Prijava OK: ${r.vozac.punoIme} / ${r.vozilo.registracija}`, 'ok');
+      loadNalozi();
+    } catch (e) {
+      $('authInfo').innerHTML = `❌ ${e.message}`;
+      log(`Prijava neuspjela: ${e.message}`, 'err');
+    }
+  }
+
+  // ───── nalozi ─────
+  async function loadNalozi() {
+    if (!state.vozilo) { log('Najprije se prijavi', 'err'); return; }
+    const datum = $('datumFilter').value;
+    let path = `/v1/radni-nalozi?voziloId=${state.vozilo.id}`;
+    if (datum) path += `&datum=${datum}`;
+    try {
+      const list = await api(path);
+      state.nalozi = list;
+      renderNalozi();
+      log(`Učitano ${list.length} naloga`, 'info');
+    } catch (e) {
+      log(`Greška učitavanja: ${e.message}`, 'err');
+    }
+  }
+
+  function renderNalozi() {
+    const el = $('nalogList');
+    if (!state.nalozi.length) {
+      el.innerHTML = '<div class="nalog-item muted">Nema naloga za odabrane filtere.</div>';
+      return;
+    }
+    el.innerHTML = state.nalozi.map(n => `
+      <div class="nalog-item ${n.id === state.selectedNalogId ? 'active' : ''}" onclick="selectNalog('${n.id}')">
+        <div><b>${n.brojRN || n.id}</b> <span class="badge ${n.status}">${n.status}</span></div>
+        <div class="meta">${n.partner?.naziv || '—'} · ${n.lokacija?.mjesto || ''} · ${n.datumUsluge}</div>
+      </div>
+    `).join('');
+  }
+
+  function selectNalog(id) {
+    state.selectedNalogId = id;
+    const n = state.nalozi.find(x => x.id === id);
+    $('selectedNalog').innerHTML = n
+      ? `📋 <b>${n.brojRN}</b> — ${n.partner?.naziv} <span class="badge ${n.status}">${n.status}</span>`
+      : '— nije odabran —';
+    renderNalozi();
+  }
+
+  function requireNalog() {
+    if (!state.selectedNalogId) { log('Odaberi radni nalog iz liste', 'err'); return null; }
+    return state.selectedNalogId;
+  }
+
+  // ───── akcije ─────
+  async function sendDolazak() {
+    const id = requireNalog(); if (!id) return;
+    const body = {
+      vrijemeDolaska: new Date().toISOString(),
+      gps: { lat: parseFloat($('gpsLat').value), lng: parseFloat($('gpsLng').value) },
+    };
+    try {
+      const r = await api(`/v1/radni-nalozi/${id}/dolazak`, { method: 'PATCH', body: JSON.stringify(body) });
+      log(`Dolazak OK — ${r.brojRN} → ${r.status}`, 'ok');
+      await loadNalozi();
+    } catch (e) { log(`Dolazak FAIL: ${e.message}`, 'err'); }
+  }
+
+  async function sendPotpis() {
+    const id = requireNalog(); if (!id) return;
+    const n = state.nalozi.find(x => x.id === id);
+    const body = {
+      potpis: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
+      potpisPartner: $('potpisnik').value,
+      stavke: n?.stavke || [],
+      timestamp: new Date().toISOString(),
+    };
+    try {
+      const r = await api(`/v1/radni-nalozi/${id}/potpis`, { method: 'POST', body: JSON.stringify(body) });
+      log(`Potpis OK — ${r.brojRN} → ${r.status} (potpisao: ${body.potpisPartner})`, 'ok');
+      await loadNalozi();
+    } catch (e) { log(`Potpis FAIL: ${e.message}`, 'err'); }
+  }
+
+  async function sendNepravilnost() {
+    const id = requireNalog(); if (!id) return;
+    const body = {
+      tip: $('nepravilnostTip').value,
+      opis: $('nepravilnostOpis').value,
+      vrijeme: new Date().toISOString(),
+    };
+    try {
+      const r = await api(`/v1/radni-nalozi/${id}/nepravilnosti`, { method: 'POST', body: JSON.stringify(body) });
+      log(`Nepravilnost OK — ${r.brojRN} → ${r.status} (${body.tip})`, 'ok');
+      await loadNalozi();
+    } catch (e) { log(`Nepravilnost FAIL: ${e.message}`, 'err'); }
+  }
+
+  async function createNalog() {
+    if (!state.vozilo) { log('Najprije se prijavi', 'err'); return; }
+    const today = new Date().toISOString().split('T')[0];
+    const body = {
+      datumUsluge: today,
+      voziloId: state.vozilo.id,
+      vozacId: state.vozac.id,
+      partner: {
+        naziv: $('newPartner').value,
+        oib: $('newOib').value,
+        adresa: $('newAdresa').value,
+        mjesto: $('newMjesto').value,
+      },
+      lokacija: {
+        naziv: $('newPartner').value,
+        adresa: $('newAdresa').value,
+        mjesto: $('newMjesto').value,
+        lat: 45.8 + Math.random() * 0.1,
+        lng: 15.9 + Math.random() * 0.2,
+      },
+      stavke: [{
+        rbr: 1,
+        sifraArtikla: 'SIM-001',
+        nazivRobe: 'Simulirani odvoz otpada',
+        tipSpremnika: $('newTip').value,
+        kolicina: parseFloat($('newKolicina').value) || 1,
+        jedMjere: 'kom',
+      }],
+      napomena: 'Generirano iz simulatora',
+    };
+    try {
+      const r = await api('/v1/radni-nalozi', { method: 'POST', body: JSON.stringify(body) });
+      log(`Kreiran nalog ${r.brojRN} (${r.partner.naziv})`, 'ok');
+      await loadNalozi();
+      return r;
+    } catch (e) { log(`Kreiranje FAIL: ${e.message}`, 'err'); return null; }
+  }
+
+  // ───── auto simulacija ─────
+  async function autoTick() {
+    state.auto.count++;
+    log(`▶ Auto tick #${state.auto.count}`, 'info');
+    const created = await createNalog();
+    if (!created) return;
+    state.selectedNalogId = created.id;
+    await new Promise(r => setTimeout(r, 400));
+    await sendDolazak();
+    await new Promise(r => setTimeout(r, 400));
+    // 80% potpis, 20% nepravilnost
+    if (Math.random() < 0.8) await sendPotpis();
+    else await sendNepravilnost();
+  }
+
+  function toggleAuto() {
+    const btn = $('autoBtn');
+    if (state.auto.running) {
+      clearInterval(state.auto.timer);
+      state.auto.running = false;
+      btn.textContent = '▶ Start';
+      btn.className = 'green';
+      $('autoStatus').textContent = `Zaustavljeno nakon ${state.auto.count} ciklusa.`;
+      log('⏸ Auto simulacija zaustavljena', 'info');
+    } else {
+      if (!state.vozilo) { log('Najprije se prijavi', 'err'); return; }
+      const interval = Math.max(1, parseInt($('autoInterval').value) || 5) * 1000;
+      state.auto.running = true;
+      state.auto.count = 0;
+      btn.textContent = '⏸ Stop';
+      btn.className = 'orange';
+      $('autoStatus').textContent = `Pokrenuto, interval ${interval/1000}s.`;
+      log(`▶ Auto simulacija pokrenuta (${interval/1000}s)`, 'info');
+      autoTick();
+      state.auto.timer = setInterval(autoTick, interval);
+    }
+  }
+
+  // ───── init ─────
+  $('datumFilter').value = new Date().toISOString().split('T')[0];
+  pingApi();
+</script>
+</body>
+</html>
